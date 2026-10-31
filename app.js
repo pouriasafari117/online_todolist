@@ -1,4 +1,4 @@
-import {setBranch,VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks} from './core.js';
+import {setBranch,listBranches,VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks} from './core.js';
 const $=id=>document.getElementById(id);
 // Keep visibility controls outside form submission and reset them whenever a form is cleared.
 document.querySelectorAll('input[data-password-field], #token').forEach(input=>{
@@ -20,16 +20,28 @@ function authMode(mode){show('auth-branch',mode==='branch');show('auth-loading',
 function sync(state,text){$('sync-bar').className=`sync-bar ${state}`;$('sync-text').textContent=text;show('retry',state==='error'&&!conflict);show('reload',conflict);show('export',conflict)}
 function explain(error){return error?.message || 'مشکلی پیش آمد؛ دوباره تلاش کن.'}
 let branchReady=false;
-function selectBranch(name){setBranch(name);branchReady=true;$('branch-indicator').textContent='شاخهٔ دفتر: '+name;}
-$('branch-form').onsubmit=e=>{e.preventDefault();try{selectBranch($('branch-name').value.trim());start()}catch(error){msg('auth-message',explain(error))}};
+function selectBranch(name){setBranch(name);branchReady=true;vault=null;$('branch-indicator').textContent='شاخهٔ دفتر: '+name;show('change-branch');}
+async function chooseBranch(){
+  branchReady=false;authMode('branch');show('change-branch',false);$('branch-indicator').textContent='';
+  const select=$('branch-name');select.replaceChildren(new Option('در حال دریافت شاخه‌ها...',''));select.disabled=true;show('branches-retry',false);
+  try{
+    const branches=await listBranches();
+    select.replaceChildren(new Option('یک شاخه انتخاب کن',''));
+    for(const branch of branches) select.add(new Option(branch,branch));
+    if(!branches.length) throw new Error('هیچ شاخه‌ای در مخزن پیدا نشد.');
+    if(branches.includes(window.ROOZANEH_BRANCH)) select.value=window.ROOZANEH_BRANCH;
+    select.disabled=false;
+  }catch(error){select.replaceChildren(new Option('دریافت شاخه‌ها ناموفق بود',''));msg('auth-message',explain(error));show('branches-retry');}
+}
+$('branches-retry').onclick=chooseBranch;
+$('change-branch').onclick=chooseBranch;
+$('branch-form').onsubmit=e=>{e.preventDefault();try{if(!$('branch-name').value)throw Error('لطفاً یک شاخه انتخاب کن.');selectBranch($('branch-name').value);start()}catch(error){msg('auth-message',explain(error))}};
 async function start(){
-  if(!branchReady){
-    if(typeof window.ROOZANEH_BRANCH==='string' && window.ROOZANEH_BRANCH){try{selectBranch(window.ROOZANEH_BRANCH)}catch(error){authMode('branch');msg('auth-message',explain(error));return}}
-    else {authMode('branch');return}
-  }
   if(!window.isSecureContext || !crypto.subtle){authMode('loading');msg('auth-message','برای رمزگذاری به HTTPS یا محیط امن مرورگر نیاز است.');return}
+  if(!branchReady){await chooseBranch();return}
+  authMode('loading');
   try{vault=await readFile(VAULT_PATH);authMode(vault?'login':'setup')}
-  catch(error){authMode('loading');msg('auth-message',explain(error)+' صفحه را دوباره بارگذاری کن.');}
+  catch(error){authMode('loading');msg('auth-message','بررسی دفتر ناموفق بود: '+explain(error));}
 }
 async function enter(t){
   await validateToken(t);
@@ -44,7 +56,7 @@ $('login-form').addEventListener('submit',async e=>{e.preventDefault();const f=e
 $('show-recovery').onclick=()=>{authMode('setup');show('cancel-recovery');};
 $('cancel-recovery').onclick=()=>{authMode('login');show('cancel-recovery',false)};
 $('setup-form').addEventListener('submit',async e=>{
-  e.preventDefault();const f=e.currentTarget;busy(f,true);msg('auth-message','');
+  e.preventDefault();const f=e.currentTarget;busy(f,true);msg('auth-message','');let vaultCreated=false;
   try{
     const t=$('token').value.trim(), password=$('setup-password').value;
     if(password!==$('setup-confirm').value) throw Error('گذرواژه‌ها یکسان نیستند.');
@@ -56,8 +68,8 @@ $('setup-form').addEventListener('submit',async e=>{
     if(current && vault && current.sha!==vault.sha) throw Error('قفل روی دستگاه دیگری تغییر کرده است. صفحه را تازه کن.');
     const encoded=await encryptToken(t,password);
     const sha=await writeFile(VAULT_PATH,encoded,current?.sha,t,current?'Replace encrypted vault':'Create encrypted vault');
-    vault={data:encoded,sha};f.reset();await enter(t);
-  }catch(error){msg('auth-message',explain(error))}finally{busy(f,false)}
+    vault={data:encoded,sha};vaultCreated=true;await enter(t);f.reset();
+  }catch(error){if(vaultCreated){f.reset();authMode('login');msg('auth-message','قفل ذخیره شد، اما ورود کامل نشد: '+explain(error)+' دوباره با گذرواژه وارد شو.')}else msg('auth-message',explain(error))}finally{busy(f,false)}
 });
 function render(){
   const list=$('task-list');list.replaceChildren();

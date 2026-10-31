@@ -40,19 +40,29 @@ export async function decryptToken(vault, password) {
   } catch { throw new Error('گذرواژه نادرست است یا فایل قفل آسیب دیده است.'); }
 }
 export class GithubError extends Error { constructor(status, message) { super(message); this.status=status; } }
-const url = path => `https://api.github.com/repos/${OWNER}/${REPO}/${path}`;
+const url = path => `https://api.github.com/repos/${OWNER}/${REPO}${path ? '/'+path : ''}`;
 async function request(path, {token, method='GET', body}={}) {
   const headers={'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
   if(token) headers.Authorization=`Bearer ${token}`;
   if(body) headers['Content-Type']='application/json';
   let response;
   try { response=await fetch(path,{method,headers,body:body?JSON.stringify(body):undefined,cache:'no-store',redirect:'error'}); }
-  catch { throw new GithubError(0,'ارتباط با GitHub برقرار نشد. اتصال اینترنت را بررسی کن.'); }
+  catch { throw new GithubError(0,'مرورگر نتوانست به GitHub وصل شود؛ اتصال اینترنت، VPN یا افزونه‌های مسدودکننده را بررسی کن.'); }
   if(!response.ok) {
     const messages={401:'توکن معتبر نیست یا منقضی شده است.',403:'دسترسی کافی نیست یا محدودیت درخواست GitHub فعال شده است.',404:'مخزن، شاخه یا فایل پیدا نشد.',409:'نسخهٔ فایل در GitHub تغییر کرده است.',422:'GitHub تغییر را نپذیرفت؛ ممکن است فایل هم‌زمان تغییر کرده باشد.'};
     throw new GithubError(response.status,messages[response.status] || `خطای GitHub (${response.status}).`);
   }
   return response.json();
+}
+export async function listBranches() {
+  const names=[];
+  for(let page=1;page<=100;page++) {
+    const result=await request(url(`branches?per_page=100&page=${page}`));
+    if(!Array.isArray(result) || result.some(branch=>typeof branch?.name!=='string')) throw new Error('فهرست شاخه‌ها از GitHub نامعتبر است.');
+    names.push(...result.map(branch=>branch.name));
+    if(result.length<100) return names;
+  }
+  throw new Error('تعداد شاخه‌ها بیش از حد قابل پشتیبانی است.');
 }
 export async function validateToken(token) {
   if (!token.startsWith('github_pat_')) throw new Error('فقط توکن fine-grained پذیرفته می‌شود.');
