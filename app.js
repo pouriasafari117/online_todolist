@@ -1,15 +1,15 @@
 import {setBranch,VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks} from './core.js';
 const $=id=>document.getElementById(id);
 // Keep visibility controls outside form submission and reset them whenever a form is cleared.
-document.querySelectorAll('input[type="password"]').forEach(input=>{
+document.querySelectorAll('input[data-password-field], #token').forEach(input=>{
   const wrapper=document.createElement('div');wrapper.className='password-field';
   input.parentNode.insertBefore(wrapper,input);wrapper.append(input);
   const button=document.createElement('button');button.type='button';button.className='password-toggle';
   const isToken=input.id==='token';
   function setVisible(visible){input.type=visible?'text':'password';button.textContent=visible?'مخفی':'نمایش';button.setAttribute('aria-pressed',String(visible));button.setAttribute('aria-label',(visible?'مخفی کردن ':'نمایش ')+(isToken?'توکن':'گذرواژه'));}
   button.addEventListener('click',()=>setVisible(input.type==='password'));
-  input.form?.addEventListener('reset',()=>setVisible(false));
-  setVisible(false);wrapper.append(button);
+  input.form?.addEventListener('reset',()=>setVisible(!isToken));
+  setVisible(!isToken);wrapper.append(button);
 });
 let token=null, vault=null, tasks=[], taskSha=null, filter='all', editId=null, revision=0, savedRevision=0, saving=false, conflict=false, timer=null;
 const fa=n=>new Intl.NumberFormat('fa-IR').format(n);
