@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {encryptToken,decryptToken,validateTasks,readFile,writeFile,validateToken,GithubError} from '../core.js';
+import {BRANCH,encryptToken,decryptToken,validateTasks,readFile,writeFile,validateToken,GithubError} from '../core.js';
 const token='github_pat_example';
 const password='long unique password';
 test('vault roundtrip, incorrect password, tamper and fresh random values',async()=>{
@@ -20,12 +20,12 @@ test('validates schema and rejects corrupt or duplicate tasks',()=>{
 });
 test('missing file is accepted only after branch verification',async()=>{
  const old=globalThis.fetch;let calls=0;
- try {globalThis.fetch=async()=>{calls++;return calls===1?new Response('{}',{status:404}):Response.json({name:'main'})};assert.equal(await readFile('data/tasks.json'),null);assert.equal(calls,2);
+ try {globalThis.fetch=async()=>{calls++;return calls===1?new Response('{}',{status:404}):Response.json({name:BRANCH})};assert.equal(await readFile('data/tasks.json'),null);assert.equal(calls,2);
  globalThis.fetch=async()=>new Response('{}',{status:404});await assert.rejects(readFile('data/tasks.json'),GithubError);
  }finally{globalThis.fetch=old}
 });
 test('write sends SHA and selected branch and unicode contents',async()=>{
- const old=globalThis.fetch;try {globalThis.fetch=async(url,options)=>{const body=JSON.parse(options.body);assert.equal(body.sha,'old');assert.equal(body.branch,'main');assert.equal(JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(body.content),c=>c.charCodeAt(0)))).title,'نان');assert.equal(options.headers.Authorization,`Bearer ${token}`);return Response.json({content:{sha:'new'}})};assert.equal(await writeFile('data/tasks.json',{title:'نان'},'old',token,'save'),'new') }finally{globalThis.fetch=old}
+ const old=globalThis.fetch;try {globalThis.fetch=async(url,options)=>{const body=JSON.parse(options.body);assert.equal(body.sha,'old');assert.equal(body.branch,BRANCH);assert.equal(JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(body.content),c=>c.charCodeAt(0)))).title,'نان');assert.equal(options.headers.Authorization,`Bearer ${token}`);return Response.json({content:{sha:'new'}})};assert.equal(await writeFile('data/tasks.json',{title:'نان'},'old',token,'save'),'new') }finally{globalThis.fetch=old}
 });
 test('validates owner and write access, rejects classic tokens',async()=>{
  const old=globalThis.fetch;let calls=0;try{globalThis.fetch=async()=>Response.json(++calls===1?{login:'pouriasafari117'}:{permissions:{push:true}});await validateToken(token);await assert.rejects(validateToken('ghp_example'));}finally{globalThis.fetch=old}

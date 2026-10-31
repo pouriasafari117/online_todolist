@@ -1,6 +1,6 @@
 export const OWNER = 'pouriasafari117';
 export const REPO = 'online_todolist';
-export const BRANCH = 'main';
+export const BRANCH = 'arena/22980cc3-online-todolist';
 export const VAULT_PATH = 'data/vault.json';
 export const TASK_PATH = 'data/tasks.json';
 const encoder = new TextEncoder();
