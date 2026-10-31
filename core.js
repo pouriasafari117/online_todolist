@@ -1,6 +1,11 @@
 export const OWNER = 'pouriasafari117';
 export const REPO = 'online_todolist';
-export const BRANCH = 'arena/22980cc3-online-todolist';
+export let BRANCH = null;
+export function setBranch(branch) {
+  if (typeof branch !== 'string' || !branch.trim() || branch.length > 255 || /[\x00-\x20\x7f]/.test(branch)) throw new Error('نام شاخه معتبر نیست.');
+  BRANCH = branch;
+}
+function requireBranch() { if (!BRANCH) throw new Error('شاخهٔ ذخیره‌سازی مشخص نشده است.'); }
 export const VAULT_PATH = 'data/vault.json';
 export const TASK_PATH = 'data/tasks.json';
 const encoder = new TextEncoder();
@@ -58,6 +63,7 @@ export async function validateToken(token) {
   return user;
 }
 export async function readFile(path, token) {
+  requireBranch();
   try {
     const data=await request(url(`contents/${path}?ref=${encodeURIComponent(BRANCH)}`),{token});
     if (data.type !== 'file' || data.encoding !== 'base64' || typeof data.content !== 'string' || !data.sha) throw new Error('قالب فایل GitHub پشتیبانی نمی‌شود.');
@@ -74,6 +80,7 @@ export async function readFile(path, token) {
   }
 }
 export async function writeFile(path, value, sha, token, message) {
+  requireBranch();
   const bytes=encoder.encode(JSON.stringify(value,null,2)+'\n');
   if(bytes.length>750000) throw new Error('حجم دفتر بیش از حد مجاز برنامه است.');
   const body={message,content:to64(bytes),branch:BRANCH};

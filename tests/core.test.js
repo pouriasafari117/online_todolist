@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {BRANCH,encryptToken,decryptToken,validateTasks,readFile,writeFile,validateToken,GithubError} from '../core.js';
+import {setBranch,encryptToken,decryptToken,validateTasks,readFile,writeFile,validateToken,GithubError} from '../core.js';
+const BRANCH='feature/example';
+setBranch(BRANCH);
 const token='github_pat_example';
 const password='long unique password';
 test('vault roundtrip, incorrect password, tamper and fresh random values',async()=>{
@@ -29,4 +31,8 @@ test('write sends SHA and selected branch and unicode contents',async()=>{
 });
 test('validates owner and write access, rejects classic tokens',async()=>{
  const old=globalThis.fetch;let calls=0;try{globalThis.fetch=async()=>Response.json(++calls===1?{login:'pouriasafari117'}:{permissions:{push:true}});await validateToken(token);await assert.rejects(validateToken('ghp_example'));}finally{globalThis.fetch=old}
+});
+
+test('branch can change without retaining the previous branch',async()=>{
+ const old=globalThis.fetch; try { setBranch('main'); globalThis.fetch=async(url,options)=>{assert.equal(JSON.parse(options.body).branch,'main');return Response.json({content:{sha:'ok'}})}; await writeFile('data/tasks.json',{},null,token,'save'); assert.throws(()=>setBranch('bad branch')); } finally {setBranch(BRANCH);globalThis.fetch=old}
 });

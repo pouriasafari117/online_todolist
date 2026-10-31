@@ -1,14 +1,21 @@
-import {OWNER,VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks} from './core.js';
+import {setBranch,VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks} from './core.js';
 const $=id=>document.getElementById(id);
 let token=null, vault=null, tasks=[], taskSha=null, filter='all', editId=null, revision=0, savedRevision=0, saving=false, conflict=false, timer=null;
 const fa=n=>new Intl.NumberFormat('fa-IR').format(n);
 function show(id, visible=true){$(id).classList.toggle('hidden',!visible)}
 function msg(id,text){$(id).textContent=text;show(id,!!text)}
 function busy(form,value){form.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=value)}
-function authMode(mode){show('auth-loading',mode==='loading');show('auth-login',mode==='login');show('auth-setup',mode==='setup');msg('auth-message','')}
+function authMode(mode){show('auth-branch',mode==='branch');show('auth-loading',mode==='loading');show('auth-login',mode==='login');show('auth-setup',mode==='setup');msg('auth-message','')}
 function sync(state,text){$('sync-bar').className=`sync-bar ${state}`;$('sync-text').textContent=text;show('retry',state==='error'&&!conflict);show('reload',conflict);show('export',conflict)}
 function explain(error){return error?.message || 'مشکلی پیش آمد؛ دوباره تلاش کن.'}
+let branchReady=false;
+function selectBranch(name){setBranch(name);branchReady=true;$('branch-indicator').textContent='شاخهٔ دفتر: '+name;}
+$('branch-form').onsubmit=e=>{e.preventDefault();try{selectBranch($('branch-name').value.trim());start()}catch(error){msg('auth-message',explain(error))}};
 async function start(){
+  if(!branchReady){
+    if(typeof window.ROOZANEH_BRANCH==='string' && window.ROOZANEH_BRANCH){try{selectBranch(window.ROOZANEH_BRANCH)}catch(error){authMode('branch');msg('auth-message',explain(error));return}}
+    else {authMode('branch');return}
+  }
   if(!window.isSecureContext || !crypto.subtle){authMode('loading');msg('auth-message','برای رمزگذاری به HTTPS یا محیط امن مرورگر نیاز است.');return}
   try{vault=await readFile(VAULT_PATH);authMode(vault?'login':'setup')}
   catch(error){authMode('loading');msg('auth-message',explain(error)+' صفحه را دوباره بارگذاری کن.');}
