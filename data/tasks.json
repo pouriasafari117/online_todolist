@@ -2,6 +2,16 @@
   "schemaVersion": 1,
   "tasks": [
     {
+      "id": "2d9ec2da-d6ce-429e-bbba-adca4437af76",
+      "title": "قران",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-10-31T20:23:36.983Z",
+      "updatedAt": "2026-10-31T20:23:36.983Z"
+    },
+    {
       "id": "9be79769-11b6-4e4f-b045-0a5763d6693c",
       "title": "تودو",
       "description": "",
