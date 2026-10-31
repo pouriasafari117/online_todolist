@@ -55,11 +55,11 @@
       "id": "407ee521-e60c-4640-82d2-b936a11fccd5",
       "title": "مباحثی در علوم",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-10-31T09:02:15.503Z",
-      "updatedAt": "2026-10-31T09:02:15.503Z"
+      "updatedAt": "2026-10-31T20:23:32.072Z"
     }
   ]
 }
