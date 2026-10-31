@@ -11,12 +11,60 @@ document.querySelectorAll('input[data-password-field], #token').forEach(input=>{
   input.form?.addEventListener('reset',()=>setVisible(!isToken));
   setVisible(!isToken);wrapper.append(button);
 });
+// Appearance and sound preferences are local to this browser; no secrets are stored.
+const paletteNames=['lavender','ocean','sunset','garden'];
+function readPreference(key){try{return localStorage.getItem(key)}catch{return null}}
+function writePreference(key,value){try{localStorage.setItem(key,value)}catch{/* storage is optional */}}
+function applyPalette(name){
+  if(!paletteNames.includes(name)) name='lavender';
+  document.body.dataset.palette=name;writePreference('roozaneh-palette',name);
+  document.querySelectorAll('[data-palette]').forEach(button=>{if(button.matches('button'))button.setAttribute('aria-pressed',String(button.dataset.palette===name))});
+}
+let soundEnabled=readPreference('roozaneh-sound')!=='off', audioContext;
+function updateSound(){const button=$('sound-toggle');button.setAttribute('aria-pressed',String(soundEnabled));button.textContent=soundEnabled?'روشن':'خاموش'}
+function playSound(kind='click'){
+  if(!soundEnabled)return;
+  try{
+    const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
+    audioContext ||= new Audio();
+    if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});
+    const now=audioContext.currentTime, notes=kind==='complete'?[659,880]:[520];
+    notes.forEach((frequency,index)=>{
+      const oscillator=audioContext.createOscillator(), gain=audioContext.createGain();
+      const start=now+index*.09;oscillator.type='sine';oscillator.frequency.setValueAtTime(frequency,start);
+      gain.gain.setValueAtTime(.0001,start);gain.gain.exponentialRampToValueAtTime(.035,start+.015);gain.gain.exponentialRampToValueAtTime(.0001,start+.16);
+      oscillator.connect(gain);gain.connect(audioContext.destination);oscillator.start(start);oscillator.stop(start+.17);
+    });
+  }catch{/* Audio availability must never block task actions. */}
+}
+applyPalette(readPreference('roozaneh-palette'));updateSound();
+document.querySelectorAll('button[data-palette]').forEach(button=>button.addEventListener('click',()=>applyPalette(button.dataset.palette)));
+$('sound-toggle').addEventListener('click',()=>{soundEnabled=!soundEnabled;writePreference('roozaneh-sound',soundEnabled?'on':'off');updateSound()});
+document.addEventListener('click',event=>{if(event.target.closest('button') && event.target.closest('button').id!=='sound-toggle')playSound()});
+let confettiFrame=0;
+function celebrate(){
+  playSound('complete');
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const canvas=$('confetti'),context=canvas.getContext('2d');if(!context)return;
+  cancelAnimationFrame(confettiFrame);canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+  const colors=['#aa92e5','#f4aebf','#8bd3bd','#f6c78b','#a6c8f4'];
+  const particles=Array.from({length:75},()=>({x:canvas.width*(.2+Math.random()*.6),y:canvas.height*.25,vx:(Math.random()-.5)*9,vy:-4-Math.random()*8,rotation:Math.random()*6,spin:(Math.random()-.5)*.2,size:5+Math.random()*6,color:colors[Math.floor(Math.random()*colors.length)]}));
+  const started=performance.now();
+  function draw(time){
+    context.clearRect(0,0,canvas.width,canvas.height);
+    for(const p of particles){p.x+=p.vx;p.y+=p.vy;p.vy+=.13;p.rotation+=p.spin;context.save();context.translate(p.x,p.y);context.rotate(p.rotation);context.fillStyle=p.color;context.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);context.restore()}
+    if(time-started<2600)confettiFrame=requestAnimationFrame(draw);else{context.clearRect(0,0,canvas.width,canvas.height);confettiFrame=0}
+  }
+  confettiFrame=requestAnimationFrame(draw);
+}
 let token=null, vault=null, tasks=[], taskSha=null, filter='all', editId=null, revision=0, savedRevision=0, saving=false, conflict=false, timer=null;
 const fa=n=>new Intl.NumberFormat('fa-IR').format(n);
 function show(id, visible=true){$(id).classList.toggle('hidden',!visible)}
 function msg(id,text){$(id).textContent=text;show(id,!!text)}
 function busy(form,value){form.querySelectorAll('button[type=submit]').forEach(b=>b.disabled=value)}
-function authMode(mode){show('auth-branch',mode==='branch');show('auth-loading',mode==='loading');show('auth-login',mode==='login');show('auth-setup',mode==='setup');msg('auth-message','')}
+function authMode(mode){show('auth-branch',mode==='branch');show('auth-loading',mode==='loading');show('auth-login',mode==='login');show('auth-setup',mode==='setup');show('auth-tabs',mode==='login'||mode==='setup');$('tab-login').setAttribute('aria-pressed',String(mode==='login'));$('tab-setup').setAttribute('aria-pressed',String(mode==='setup'));msg('auth-message','')}
+$('tab-login').onclick=()=>{authMode('login');show('cancel-recovery',false);if(!vault)msg('auth-message','هنوز حسابی روی این شاخه ساخته نشده است. ابتدا ساخت حساب را انتخاب کن.')};
+$('tab-setup').onclick=()=>{if(vault){authMode('login');msg('auth-message','یک حساب روی این شاخه وجود دارد. برای ورود گذرواژه را وارد کن یا از گزینهٔ بازیابی توکن استفاده کن.')}else{authMode('setup');show('cancel-recovery',false)}};
 function sync(state,text){$('sync-bar').className=`sync-bar ${state}`;$('sync-text').textContent=text;show('retry',state==='error'&&!conflict);show('reload',conflict);show('export',conflict)}
 function explain(error){return error?.message || 'مشکلی پیش آمد؛ دوباره تلاش کن.'}
 let branchReady=false;
@@ -52,7 +100,7 @@ async function enter(t){
   $('today').textContent=new Intl.DateTimeFormat('fa-IR',{weekday:'long',day:'numeric',month:'long'}).format(new Date());
   sync('','همگام با GitHub');render();
 }
-$('login-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget;busy(f,true);msg('auth-message','');try{const t=await decryptToken(vault.data,$('login-password').value);await enter(t);f.reset()}catch(error){msg('auth-message',explain(error))}finally{busy(f,false)}});
+$('login-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget;busy(f,true);msg('auth-message','');try{if(!vault)throw Error('هنوز حسابی روی این شاخه ساخته نشده است. ابتدا ساخت حساب را انتخاب کن.');const t=await decryptToken(vault.data,$('login-password').value);await enter(t);f.reset()}catch(error){msg('auth-message',explain(error))}finally{busy(f,false)}});
 $('show-recovery').onclick=()=>{authMode('setup');show('cancel-recovery');};
 $('cancel-recovery').onclick=()=>{authMode('login');show('cancel-recovery',false)};
 $('setup-form').addEventListener('submit',async e=>{
@@ -77,7 +125,7 @@ function render(){
   const visible=tasks.filter(t=>(filter==='all'||(filter==='done'?t.completed:!t.completed)) && (t.title+' '+t.description).toLocaleLowerCase('fa').includes(search));
   for(const t of visible){
     const row=document.createElement('div');row.className='task'+(t.completed?' completed':'');
-    const check=document.createElement('input');check.type='checkbox';check.className='task-check';check.checked=t.completed;check.setAttribute('aria-label',`تغییر وضعیت ${t.title}`);check.onchange=()=>{t.completed=check.checked;t.updatedAt=new Date().toISOString();changed()};
+    const check=document.createElement('input');check.type='checkbox';check.className='task-check';check.checked=t.completed;check.setAttribute('aria-label',`تغییر وضعیت ${t.title}`);check.onchange=()=>{t.completed=check.checked;t.updatedAt=new Date().toISOString();if(t.completed)celebrate();changed()};
     const content=document.createElement('div');content.className='task-content';const title=document.createElement('div');title.className='task-title';title.textContent=t.title;content.append(title);
     const meta=document.createElement('div');meta.className='task-meta';meta.textContent=[t.description,t.dueDate?'سررسید: '+t.dueDate:'',t.priority==='high'?'اولویت زیاد':t.priority==='low'?'اولویت کم':''].filter(Boolean).join(' · ');if(meta.textContent)content.append(meta);
     const edit=document.createElement('button');edit.className='task-action';edit.type='button';edit.textContent='✎';edit.setAttribute('aria-label',`ویرایش ${t.title}`);edit.onclick=()=>openEdit(t);
