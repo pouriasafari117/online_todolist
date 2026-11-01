@@ -2,16 +2,6 @@
   "schemaVersion": 2,
   "tasks": [
     {
-      "id": "1453ef7c-b392-47d6-ad55-fa825bcb132b",
-      "title": "مباحثی در علوم",
-      "description": "",
-      "completed": true,
-      "priority": "normal",
-      "dueDate": null,
-      "createdAt": "2026-10-31T09:02:25.074Z",
-      "updatedAt": "2026-10-31T20:23:14.286Z"
-    },
-    {
       "id": "f5d1101e-1118-422f-86bc-03e2eb3f4e80",
       "title": "مباحثی در علوم",
       "description": "",
