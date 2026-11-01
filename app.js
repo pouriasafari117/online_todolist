@@ -1,4 +1,4 @@
-import {VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks} from './core.js';
+import {VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks,prepareBook,todayInTehran,nextDay} from './core.js';
 const $=id=>document.getElementById(id);
 // Keep visibility controls outside form submission and reset them whenever a form is cleared.
 document.querySelectorAll('input[data-password-field], #token').forEach(input=>{
@@ -12,7 +12,7 @@ document.querySelectorAll('input[data-password-field], #token').forEach(input=>{
   setVisible(!isToken);wrapper.append(button);
 });
 // Appearance and sound preferences are local to this browser; no secrets are stored.
-const paletteNames=['lavender','ocean','sunset','garden'];
+const paletteNames=['lavender','ocean','sunset','garden','night','midnight','forest','ember'];
 function readPreference(key){try{return localStorage.getItem(key)}catch{return null}}
 function writePreference(key,value){try{localStorage.setItem(key,value)}catch{/* storage is optional */}}
 function applyPalette(name){
@@ -57,7 +57,7 @@ function celebrate(){
   }
   confettiFrame=requestAnimationFrame(draw);
 }
-let token=null, vault=null, tasks=[], taskSha=null, filter='all', editId=null, revision=0, savedRevision=0, saving=false, conflict=false, timer=null;
+let token=null, vault=null, book=null, tasks=[], taskSha=null, filter='all', editId=null, revision=0, savedRevision=0, saving=false, conflict=false, timer=null;
 const fa=n=>new Intl.NumberFormat('fa-IR').format(n);
 function show(id, visible=true){$(id).classList.toggle('hidden',!visible)}
 function msg(id,text){$(id).textContent=text;show(id,!!text)}
@@ -76,11 +76,11 @@ async function start(){
 async function enter(t){
   await validateToken(t);
   const remote=await readFile(TASK_PATH,t);
-  const data=remote?validateTasks(remote.data):{schemaVersion:1,tasks:[]};
-  token=t;tasks=data.tasks;taskSha=remote?.sha??null;revision=0;savedRevision=0;conflict=false;
-  show('auth-view',false);show('app-view');show('settings-open');show('lock');
-  $('today').textContent=new Intl.DateTimeFormat('fa-IR',{weekday:'long',day:'numeric',month:'long'}).format(new Date());
-  sync('','همگام با GitHub');render();
+  const {book:loaded,changed:migrated}=prepareBook(remote?remote.data:{schemaVersion:1,tasks:[]});
+  token=t;book=loaded;tasks=book.tasks;taskSha=remote?.sha??null;revision=0;savedRevision=0;conflict=false;
+  show('auth-view',false);show('app-view');show('settings-open');show('history-open');show('lock');
+  $('today').textContent=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',weekday:'long',day:'numeric',month:'long'}).format(new Date());
+  sync('','همگام با GitHub');render();renderDaily();if(migrated)changed();
 }
 $('login-form').addEventListener('submit',async e=>{e.preventDefault();const f=e.currentTarget;busy(f,true);msg('auth-message','');try{if(!vault)throw Error('هنوز حسابی ساخته نشده است. ابتدا ساخت حساب را انتخاب کن.');const t=await decryptToken(vault.data,$('login-password').value);await enter(t);f.reset()}catch(error){msg('auth-message',explain(error))}finally{busy(f,false)}});
 $('show-recovery').onclick=()=>{authMode('setup');show('cancel-recovery');};
@@ -107,11 +107,11 @@ function render(){
   const visible=tasks.filter(t=>(filter==='all'||(filter==='done'?t.completed:!t.completed)) && (t.title+' '+t.description).toLocaleLowerCase('fa').includes(search));
   for(const t of visible){
     const row=document.createElement('div');row.className='task'+(t.completed?' completed':'');
-    const check=document.createElement('input');check.type='checkbox';check.className='task-check';check.checked=t.completed;check.setAttribute('aria-label',`تغییر وضعیت ${t.title}`);check.onchange=()=>{t.completed=check.checked;t.updatedAt=new Date().toISOString();if(t.completed)celebrate();changed()};
+    const check=document.createElement('input');check.type='checkbox';check.className='task-check';check.checked=t.completed;check.setAttribute('aria-label',`تغییر وضعیت ${t.title}`);check.onchange=()=>{if(!refreshDay()){check.checked=t.completed;return}const current=tasks.find(item=>item.id===t.id);if(!current){render();return}current.completed=check.checked;current.updatedAt=new Date().toISOString();if(current.completed)celebrate();changed()};
     const content=document.createElement('div');content.className='task-content';const title=document.createElement('div');title.className='task-title';title.textContent=t.title;content.append(title);
-    const meta=document.createElement('div');meta.className='task-meta';meta.textContent=[t.description,t.dueDate?'سررسید: '+t.dueDate:'',t.priority==='high'?'اولویت زیاد':t.priority==='low'?'اولویت کم':''].filter(Boolean).join(' · ');if(meta.textContent)content.append(meta);
+    const meta=document.createElement('div');meta.className='task-meta';meta.textContent=[t.dailyTemplateId?'روزانه ↻':'',t.description,t.dueDate?'سررسید: '+t.dueDate:'',t.priority==='high'?'اولویت زیاد':t.priority==='low'?'اولویت کم':''].filter(Boolean).join(' · ');if(meta.textContent)content.append(meta);
     const edit=document.createElement('button');edit.className='task-action';edit.type='button';edit.textContent='✎';edit.setAttribute('aria-label',`ویرایش ${t.title}`);edit.onclick=()=>openEdit(t);
-    const del=document.createElement('button');del.className='task-action';del.type='button';del.textContent='×';del.setAttribute('aria-label',`حذف ${t.title}`);del.onclick=()=>{if(confirm('این کار حذف شود؟')){tasks=tasks.filter(x=>x.id!==t.id);changed()}};
+    const del=document.createElement('button');del.className='task-action';del.type='button';del.textContent='×';del.setAttribute('aria-label',`حذف ${t.title}`);del.onclick=()=>{if(!refreshDay())return;if(confirm('این کار حذف شود؟')){tasks=tasks.filter(x=>x.id!==t.id);changed()}};
     row.append(check,content,edit,del);list.append(row);
   }
   show('empty',visible.length===0);const done=tasks.filter(t=>t.completed).length, total=tasks.length, percentage=total?Math.round(done/total*100):0;
@@ -120,7 +120,7 @@ function render(){
 function changed(){revision++;render();if(conflict){sync('error','تعارض همگام‌سازی؛ نسخهٔ محلی را دریافت کن یا نسخهٔ GitHub را بارگذاری کن.');return}sync('pending','تغییرات در انتظار همگام‌سازی...');clearTimeout(timer);timer=setTimeout(save,800)}
 async function save(){
   clearTimeout(timer);if(saving||!token||conflict||revision===savedRevision)return;
-  saving=true;const currentRevision=revision;const snapshot=structuredClone({schemaVersion:1,tasks});const baseSha=taskSha;
+  saving=true;const currentRevision=revision;const snapshot=structuredClone({...book,tasks});const baseSha=taskSha;
   sync('pending','در حال ذخیره در GitHub...');
   try{taskSha=await writeFile(TASK_PATH,snapshot,baseSha,token,'Update personal tasks');savedRevision=currentRevision;sync('',revision===savedRevision?'همگام با GitHub':'تغییرات در انتظار همگام‌سازی...')}
   catch(error){
@@ -130,14 +130,47 @@ async function save(){
   }finally{saving=false;if(!conflict && revision!==savedRevision && !$('sync-bar').classList.contains('error'))timer=setTimeout(save,800)}
 }
 $('retry').onclick=save;
-$('reload').onclick=async()=>{if(!confirm('تغییرات ذخیره‌نشدهٔ این دستگاه کنار گذاشته و نسخهٔ GitHub دریافت شود؟'))return;try{const remote=await readFile(TASK_PATH,token);tasks=remote?validateTasks(remote.data).tasks:[];taskSha=remote?.sha??null;revision=0;savedRevision=0;conflict=false;render();sync('','همگام با GitHub')}catch(e){sync('error',explain(e))}};
-$('export').onclick=()=>{const blob=new Blob([JSON.stringify({schemaVersion:1,tasks},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='roozaneh-local-tasks.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
-$('add-form').onsubmit=e=>{e.preventDefault();const title=$('new-title').value.trim();if(!title)return;const now=new Date().toISOString();tasks.unshift({id:crypto.randomUUID(),title,description:'',completed:false,priority:'normal',dueDate:null,createdAt:now,updatedAt:now});e.currentTarget.reset();changed()};
+$('reload').onclick=async()=>{if(!confirm('تغییرات ذخیره‌نشدهٔ این دستگاه کنار گذاشته و نسخهٔ GitHub دریافت شود؟'))return;try{const remote=await readFile(TASK_PATH,token);const prepared=prepareBook(remote?remote.data:{schemaVersion:1,tasks:[]});book=prepared.book;tasks=book.tasks;taskSha=remote?.sha??null;revision=0;savedRevision=0;conflict=false;render();renderDaily();sync('','همگام با GitHub');if(prepared.changed)changed()}catch(e){sync('error',explain(e))}};
+$('export').onclick=()=>{const blob=new Blob([JSON.stringify({...book,tasks},null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='roozaneh-local-tasks.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+$('add-form').onsubmit=e=>{e.preventDefault();if(!refreshDay())return;const title=$('new-title').value.trim();if(!title)return;const now=new Date().toISOString();tasks.unshift({id:crypto.randomUUID(),title,description:'',completed:false,priority:'normal',dueDate:null,createdAt:now,updatedAt:now});e.currentTarget.reset();changed()};
 document.querySelectorAll('.filter').forEach(button=>button.onclick=()=>{filter=button.dataset.filter;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b===button));render()});$('search').oninput=render;
 function openEdit(t){editId=t.id;$('edit-title').value=t.title;$('edit-description').value=t.description;$('edit-due').value=t.dueDate||'';$('edit-priority').value=t.priority;$('edit-dialog').showModal()}
-$('edit-form').onsubmit=e=>{e.preventDefault();const t=tasks.find(x=>x.id===editId),title=$('edit-title').value.trim();if(!t||!title)return;t.title=title;t.description=$('edit-description').value.trim();t.dueDate=$('edit-due').value||null;t.priority=$('edit-priority').value;t.updatedAt=new Date().toISOString();$('edit-dialog').close();changed()};
-document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>b.closest('dialog').close());$('settings-open').onclick=()=>{$('password-form').reset();msg('settings-message','');$('settings-dialog').showModal()};
+$('edit-form').onsubmit=e=>{e.preventDefault();if(!refreshDay())return;const t=tasks.find(x=>x.id===editId),title=$('edit-title').value.trim();if(!t||!title)return;t.title=title;t.description=$('edit-description').value.trim();t.dueDate=$('edit-due').value||null;t.priority=$('edit-priority').value;t.updatedAt=new Date().toISOString();$('edit-dialog').close();changed()};
+function renderDaily(){
+  const list=$('daily-list');list.replaceChildren();if(!book)return;
+  if(!book.dailyTemplates.length){const p=document.createElement('p');p.className='daily-empty';p.textContent='هنوز کار ثابتی اضافه نکرده‌ای.';list.append(p);return}
+  for(const template of book.dailyTemplates){
+    const row=document.createElement('div');row.className='daily-item';
+    const title=document.createElement('span');title.textContent=template.title;
+    const edit=document.createElement('button');edit.type='button';edit.className='task-action';edit.textContent='✎';edit.setAttribute('aria-label','ویرایش کار ثابت '+template.title);
+    edit.onclick=()=>{if(!refreshDay())return;const value=prompt('عنوان کار ثابت را ویرایش کن:',template.title);if(value===null)return;const title=value.trim();if(!title||title.length>200){alert('عنوان باید بین ۱ تا ۲۰۰ نویسه باشد.');return}const current=book.dailyTemplates.find(item=>item.id===template.id);if(current){current.title=title;renderDaily();changed()}};
+    const remove=document.createElement('button');remove.type='button';remove.className='task-action';remove.textContent='×';remove.setAttribute('aria-label','حذف کار ثابت '+template.title);
+    remove.onclick=()=>{if(!refreshDay())return;if(confirm('این کار از برنامهٔ روزهای بعد حذف شود؟')){book.dailyTemplates=book.dailyTemplates.filter(item=>item.id!==template.id);renderDaily();changed()}};
+    row.append(title,edit,remove);list.append(row);
+  }
+}
+$('daily-form').onsubmit=e=>{e.preventDefault();if(!refreshDay())return;const title=$('daily-title').value.trim();if(!title)return;if(book.dailyTemplates.length>=100){alert('حداکثر ۱۰۰ کار روزانه قابل ثبت است.');return}book.dailyTemplates.push({id:crypto.randomUUID(),title,startDate:nextDay(book.currentDay)});e.currentTarget.reset();renderDaily();changed()};
+function renderHistory(){
+  const list=$('history-list');list.replaceChildren();
+  if(!book.history.length){const p=document.createElement('p');p.className='daily-empty';p.textContent='هنوز روزی در تاریخچه ثبت نشده است.';list.append(p);return}
+  for(const entry of [...book.history].reverse()){
+    const group=document.createElement('details');group.className='history-day';
+    const summary=document.createElement('summary');const date=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(new Date(entry.date+'T12:00:00Z'));
+    const done=entry.tasks.filter(t=>t.completed).length;summary.textContent=`${date}  ·  ${fa(done)} از ${fa(entry.tasks.length)} انجام شده`;group.append(summary);
+    if(!entry.tasks.length){const p=document.createElement('p');p.className='daily-empty';p.textContent='کاری ثبت نشده بود.';group.append(p)}
+    for(const task of entry.tasks){const row=document.createElement('div');row.className='history-item';const mark=document.createElement('span');mark.className=task.completed?'history-check done':'history-check';mark.textContent=task.completed?'✓':'○';const name=document.createElement('span');name.textContent=task.title+(task.dailyTemplateId?'  ↻':'');row.append(mark,name);group.append(row)}list.append(group);
+  }
+}
+$('history-open').onclick=()=>{if(!refreshDay())return;renderHistory();$('history-dialog').showModal()};
+function refreshDay(){
+  if(!token||!book)return true;
+  try{const prepared=prepareBook({...book,tasks});if(prepared.changed){book=prepared.book;tasks=book.tasks;$('today').textContent=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',weekday:'long',day:'numeric',month:'long'}).format(new Date());renderDaily();if($('history-dialog').open)renderHistory();changed()}return true}
+  catch(error){sync('error',explain(error));show('retry',false);return false}
+}
+setInterval(()=>{if(token && book && todayInTehran()!==book.currentDay)refreshDay()},30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshDay()});
+document.querySelectorAll('.close-dialog').forEach(b=>b.onclick=()=>b.closest('dialog').close());$('settings-open').onclick=()=>{if(!refreshDay())return;renderDaily();$('password-form').reset();msg('settings-message','');$('settings-dialog').showModal()};
 $('password-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget;busy(f,true);msg('settings-message','');try{if($('new-password').value!==$('new-confirm').value)throw Error('گذرواژه‌های جدید یکسان نیستند.');const current=await readFile(VAULT_PATH,token);if(!current)throw Error('فایل قفل پیدا نشد.');const oldToken=await decryptToken(current.data,$('old-password').value);if(oldToken!==token)throw Error('توکن قفل تغییر کرده است؛ دوباره وارد شو.');const data=await encryptToken(token,$('new-password').value);const sha=await writeFile(VAULT_PATH,data,current.sha,token,'Change vault passphrase');vault={data,sha};f.reset();msg('settings-message','گذرواژه تغییر کرد. دستگاه‌های دیگر برای باز کردن قفل به گذرواژهٔ جدید نیاز دارند.')}catch(error){msg('settings-message',explain(error))}finally{busy(f,false)}};
-$('lock').onclick=()=>{if(saving){sync('pending','صبر کن تا ذخیرهٔ جاری تمام شود.');return}if(revision!==savedRevision&&!confirm('تغییرات ذخیره‌نشده از بین می‌روند. قفل شود؟'))return;clearTimeout(timer);token=null;tasks=[];show('app-view',false);show('settings-open',false);show('lock',false);show('auth-view');start()};
+$('lock').onclick=()=>{if(saving){sync('pending','صبر کن تا ذخیرهٔ جاری تمام شود.');return}if(revision!==savedRevision&&!confirm('تغییرات ذخیره‌نشده از بین می‌روند. قفل شود؟'))return;clearTimeout(timer);token=null;book=null;tasks=[];show('app-view',false);show('settings-open',false);show('history-open',false);show('lock',false);show('auth-view');start()};
 window.addEventListener('beforeunload',e=>{if(revision!==savedRevision||saving){e.preventDefault();e.returnValue=''}});
 start();
