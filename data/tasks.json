@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "tasks": [
     {
       "id": "2d9ec2da-d6ce-429e-bbba-adca4437af76",
@@ -71,5 +71,8 @@
       "createdAt": "2026-10-31T09:02:15.503Z",
       "updatedAt": "2026-10-31T20:23:32.072Z"
     }
-  ]
+  ],
+  "currentDay": "2026-11-01",
+  "dailyTemplates": [],
+  "history": []
 }
