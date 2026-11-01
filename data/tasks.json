@@ -2,6 +2,16 @@
   "schemaVersion": 2,
   "tasks": [
     {
+      "id": "2baced4c-68ad-43de-a3f0-366685103275",
+      "title": "کد روزانه",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-01T13:38:34.397Z",
+      "updatedAt": "2026-11-01T13:38:34.397Z"
+    },
+    {
       "id": "4d4f4f8a-771d-4928-a108-53a736588a1d",
       "title": "قران",
       "description": "",
