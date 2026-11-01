@@ -2,6 +2,16 @@
   "schemaVersion": 2,
   "tasks": [
     {
+      "id": "4d4f4f8a-771d-4928-a108-53a736588a1d",
+      "title": "قران",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-01T13:38:25.492Z",
+      "updatedAt": "2026-11-01T13:38:25.492Z"
+    },
+    {
       "id": "6852e266-b144-41a6-be75-06625271bf9f",
       "title": "درس فردا 4",
       "description": "",
