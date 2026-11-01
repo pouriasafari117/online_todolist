@@ -2,6 +2,12 @@
   "schemaVersion": 2,
   "tasks": [],
   "currentDay": "2026-11-01",
-  "dailyTemplates": [],
+  "dailyTemplates": [
+    {
+      "id": "1f20043a-2217-47d9-8d14-ea2a073e5f70",
+      "title": "درس فردا 1",
+      "startDate": "2026-11-02"
+    }
+  ],
   "history": []
 }
