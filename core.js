@@ -1,11 +1,6 @@
 export const OWNER = 'pouriasafari117';
 export const REPO = 'online_todolist';
-export let BRANCH = null;
-export function setBranch(branch) {
-  if (typeof branch !== 'string' || !branch.trim() || branch.length > 255 || /[\x00-\x20\x7f]/.test(branch)) throw new Error('نام شاخه معتبر نیست.');
-  BRANCH = branch;
-}
-function requireBranch() { if (!BRANCH) throw new Error('شاخهٔ ذخیره‌سازی مشخص نشده است.'); }
+export const BRANCH = 'main';
 export const VAULT_PATH = 'data/vault.json';
 export const TASK_PATH = 'data/tasks.json';
 const encoder = new TextEncoder();
@@ -54,16 +49,6 @@ async function request(path, {token, method='GET', body}={}) {
   }
   return response.json();
 }
-export async function listBranches() {
-  const names=[];
-  for(let page=1;page<=100;page++) {
-    const result=await request(url(`branches?per_page=100&page=${page}`));
-    if(!Array.isArray(result) || result.some(branch=>typeof branch?.name!=='string')) throw new Error('فهرست شاخه‌ها از GitHub نامعتبر است.');
-    names.push(...result.map(branch=>branch.name));
-    if(result.length<100) return names;
-  }
-  throw new Error('تعداد شاخه‌ها بیش از حد قابل پشتیبانی است.');
-}
 export async function validateToken(token) {
   if (!token.startsWith('github_pat_')) throw new Error('فقط توکن fine-grained پذیرفته می‌شود.');
   const user=await request('https://api.github.com/user',{token});
@@ -73,7 +58,6 @@ export async function validateToken(token) {
   return user;
 }
 export async function readFile(path, token) {
-  requireBranch();
   try {
     const data=await request(url(`contents/${path}?ref=${encodeURIComponent(BRANCH)}`),{token});
     if (data.type !== 'file' || data.encoding !== 'base64' || typeof data.content !== 'string' || !data.sha) throw new Error('قالب فایل GitHub پشتیبانی نمی‌شود.');
@@ -90,7 +74,6 @@ export async function readFile(path, token) {
   }
 }
 export async function writeFile(path, value, sha, token, message) {
-  requireBranch();
   const bytes=encoder.encode(JSON.stringify(value,null,2)+'\n');
   if(bytes.length>750000) throw new Error('حجم دفتر بیش از حد مجاز برنامه است.');
   const body={message,content:to64(bytes),branch:BRANCH};
