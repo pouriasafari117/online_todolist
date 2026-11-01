@@ -83,11 +83,69 @@ export async function writeFile(path, value, sha, token, message) {
   return result.content.sha;
 }
 export function validateTasks(data) {
-  if (!data || data.schemaVersion !== 1 || !Array.isArray(data.tasks) || data.tasks.length>5000) throw new Error('نسخه یا ساختار دفتر قابل خواندن نیست؛ فایل بازنویسی نمی‌شود.');
-  const ids=new Set();
-  for(const t of data.tasks) {
-    if(!t || typeof t.id!=='string' || !t.id || ids.has(t.id) || typeof t.title!=='string' || !t.title.trim() || t.title.length>200 || typeof t.description!=='string' || t.description.length>2000 || typeof t.completed!=='boolean' || !['low','normal','high'].includes(t.priority) || !(t.dueDate===null || (typeof t.dueDate==='string' && /^\d{4}-\d{2}-\d{2}$/.test(t.dueDate))) || typeof t.createdAt!=='string' || typeof t.updatedAt!=='string') throw new Error('دادهٔ یکی از کارها نامعتبر است؛ فایل بازنویسی نمی‌شود.');
-    ids.add(t.id);
+  const fail=()=>{throw new Error('نسخه یا ساختار دفتر قابل خواندن نیست؛ فایل بازنویسی نمی‌شود.')};
+  const validateList=list=>{
+    if(!Array.isArray(list)||list.length>5000)fail();
+    const ids=new Set();
+    for(const t of list){
+      if(!t || typeof t.id!=='string' || !t.id || ids.has(t.id) || typeof t.title!=='string' || !t.title.trim() || t.title.length>200 || typeof t.description!=='string' || t.description.length>2000 || typeof t.completed!=='boolean' || !['low','normal','high'].includes(t.priority) || !(t.dueDate===null || (typeof t.dueDate==='string' && /^\d{4}-\d{2}-\d{2}$/.test(t.dueDate))) || typeof t.createdAt!=='string' || typeof t.updatedAt!=='string' || (t.dailyTemplateId!==undefined && (typeof t.dailyTemplateId!=='string' || !t.dailyTemplateId))) fail();
+      ids.add(t.id);
+    }
+  };
+  if(!data || ![1,2].includes(data.schemaVersion))fail();
+  validateList(data.tasks);
+  if(data.schemaVersion===2){
+    try{checkDay(data.currentDay)}catch{fail()}
+    if(!Array.isArray(data.dailyTemplates)||data.dailyTemplates.length>100 || !Array.isArray(data.history)||data.history.length>3660)fail();
+    const ids=new Set();
+    for(const t of data.dailyTemplates){
+      if(!t || typeof t.id!=='string' || !t.id || ids.has(t.id) || typeof t.title!=='string' || !t.title.trim() || t.title.length>200)fail();
+      try{checkDay(t.startDate)}catch{fail()}
+      ids.add(t.id);
+    }
+    let previous='';
+    for(const entry of data.history){
+      if(!entry)fail();try{checkDay(entry.date)}catch{fail()}
+      if(entry.date>=data.currentDay || (previous && entry.date<=previous))fail();
+      previous=entry.date;validateList(entry.tasks);
+    }
   }
   return data;
+}
+// A single time zone keeps the definition of "today" consistent across devices.
+export function todayInTehran(now = new Date()) {
+  const parts = new Intl.DateTimeFormat('en-CA', {timeZone:'Asia/Tehran',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(now);
+  const get = name => parts.find(part => part.type === name).value;
+  return `${get('year')}-${get('month')}-${get('day')}`;
+}
+export function nextDay(day) {
+  const date = new Date(`${day}T00:00:00Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Number.isNaN(date.getTime()) || date.toISOString().slice(0,10)!==day) throw new Error('تاریخ دفتر نامعتبر است.');
+  date.setUTCDate(date.getUTCDate()+1);
+  return date.toISOString().slice(0,10);
+}
+function checkDay(day) { nextDay(day); return day; }
+function dailyTask(template, day) {
+  const timestamp=`${day}T00:00:00.000Z`;
+  return {id:`daily-${template.id}-${day}`,title:template.title,description:'',completed:false,priority:'normal',dueDate:null,createdAt:timestamp,updatedAt:timestamp,dailyTemplateId:template.id};
+}
+// Returns a new document. Old daily instances become immutable snapshots; ordinary tasks remain.
+export function prepareBook(input, day = todayInTehran()) {
+  checkDay(day);
+  const original=validateTasks(input);
+  if(original.schemaVersion===1) return {book:{...original,schemaVersion:2,currentDay:day,dailyTemplates:[],history:[]},changed:true};
+  const book=structuredClone(original);
+  if(book.currentDay>day) throw new Error('تاریخ دستگاه از تاریخ دفتر عقب‌تر است؛ ساعت دستگاه را بررسی کن.');
+  if(book.currentDay===day) return {book,changed:false};
+  let steps=0;
+  while(book.currentDay<day){
+    if(++steps>3660 || book.history.length>=3660) throw new Error('تاریخچه بیش از حد مجاز است؛ دفتر بازنویسی نشد.');
+    book.history.push({date:book.currentDay,tasks:structuredClone(book.tasks)});
+    book.currentDay=nextDay(book.currentDay);
+    book.tasks=book.tasks.filter(task=>!task.dailyTemplateId);
+    for(const template of book.dailyTemplates) if(template.startDate<=book.currentDay) book.tasks.push(dailyTask(template,book.currentDay));
+    if(book.tasks.length>5000) throw new Error('تعداد کارها بیش از حد مجاز است؛ دفتر بازنویسی نشد.');
+  }
+  if(new TextEncoder().encode(JSON.stringify(book,null,2)+'\n').length>750000) throw new Error('حجم دفتر بیش از حد مجاز است؛ تاریخچه حذف یا بازنویسی نشد.');
+  return {book,changed:true};
 }

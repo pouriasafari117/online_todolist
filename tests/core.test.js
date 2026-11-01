@@ -44,3 +44,24 @@ test('network errors do not reveal request credentials',async()=>{
 test('reads and writes target main regardless of deployment branch',async()=>{
  const old=globalThis.fetch;try {assert.equal(BRANCH,'main');globalThis.fetch=async(url,options)=>{if(options.method==='PUT'){assert.equal(JSON.parse(options.body).branch,'main');return Response.json({content:{sha:'ok'}})}assert.match(url,/ref=main/);return Response.json({type:'file',encoding:'base64',sha:'v',content:btoa('{"schemaVersion":1,"tasks":[]}')})};await readFile('data/tasks.json');await writeFile('data/tasks.json',{},null,token,'save');}finally{globalThis.fetch=old}
 });
+
+test('legacy tasks migrate without losing data or fabricating past history',async()=>{
+ const {prepareBook}=await import('../core.js');const task={id:'1',title:'قدیمی',description:'',completed:true,priority:'normal',dueDate:null,createdAt:'old',updatedAt:'old'};
+ const old={schemaVersion:1,tasks:[task],custom:'preserve'};const {book,changed}=prepareBook(old,'2026-11-01');
+ assert.equal(changed,true);assert.equal(book.schemaVersion,2);assert.deepEqual(book.tasks,[task]);assert.equal(book.custom,'preserve');assert.deepEqual(book.history,[]);assert.equal(old.schemaVersion,1);
+});
+test('daily tasks reset for each Tehran day and preserve historical snapshots',async()=>{
+ const {prepareBook}=await import('../core.js');const task={id:'ordinary',title:'کار عادی',description:'',completed:false,priority:'normal',dueDate:null,createdAt:'x',updatedAt:'x'};
+ let book={schemaVersion:2,currentDay:'2026-11-01',tasks:[task],dailyTemplates:[{id:'template',title:'ورزش',startDate:'2026-11-02'}],history:[]};
+ book=prepareBook(book,'2026-11-02').book;assert.equal(book.history.length,1);assert.equal(book.tasks.length,2);assert.equal(book.tasks[1].completed,false);book.tasks[1].completed=true;
+ const result=prepareBook(book,'2026-11-04').book;assert.equal(result.history.length,3);assert.equal(result.history[1].tasks[1].completed,true);assert.equal(result.history[2].tasks[1].completed,false);assert.equal(result.tasks[1].completed,false);assert.notEqual(result.tasks[1].id,book.tasks[1].id);assert.equal(result.tasks[0].id,'ordinary');
+ const repeat=prepareBook(result,'2026-11-04');assert.equal(repeat.changed,false);assert.deepEqual(repeat.book,result);
+});
+test('removed templates do not erase today or history, and clock rollback never discards data',async()=>{
+ const {prepareBook}=await import('../core.js');const b={schemaVersion:2,currentDay:'2026-01-01',tasks:[],dailyTemplates:[{id:'a',title:'مطالعه',startDate:'2026-01-02'}],history:[]};
+ const today=prepareBook(b,'2026-01-02').book;today.dailyTemplates=[];const next=prepareBook(today,'2026-01-03').book;
+ assert.equal(next.tasks.length,0);assert.equal(next.history.at(-1).tasks[0].title,'مطالعه');assert.throws(()=>prepareBook(today,'2026-01-01'));assert.equal(today.tasks.length,1);
+});
+test('Tehran calendar defines rollover independently of the device timezone',async()=>{
+ const {todayInTehran,nextDay}=await import('../core.js');assert.equal(todayInTehran(new Date('2026-01-01T20:29:59Z')),'2026-01-01');assert.equal(todayInTehran(new Date('2026-01-01T20:30:00Z')),'2026-01-02');assert.equal(nextDay('2024-02-28'),'2024-02-29');assert.throws(()=>nextDay('2026-02-30'));
+});

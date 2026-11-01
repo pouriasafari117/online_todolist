@@ -37,3 +37,32 @@ dialog[open]{animation:dialog-enter .3s cubic-bezier(.2,.7,.2,1) both}
 @keyframes check-pop{0%{transform:scale(.8)}65%{transform:scale(1.18)}100%{transform:scale(1)}}
 @keyframes status-pulse{0%,100%{box-shadow:0 0 0 0 #91bcae55}50%{box-shadow:0 0 0 5px #91bcae00}}
 @keyframes dialog-enter{from{opacity:0;transform:translateY(12px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+/* Clearer glass, while preserving contrast for the daily list. */
+.glass{background:#ffffffcc;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 16px 48px #55527820}
+.background span{filter:blur(28px)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.palette-heading{border-top:1px solid #eae5f0;padding-top:13px;margin-top:5px;font-size:11px;color:#797088}.palette-heading span{float:left;font-size:15px;color:#a496c5}
+.palette-night span{background:linear-gradient(135deg,#201a3c,#493566,#242d50,#664653)}.palette-midnight span{background:linear-gradient(135deg,#10253b,#284462,#293555,#345b65)}.palette-forest span{background:linear-gradient(135deg,#142e2a,#284a39,#243b49,#525038)}.palette-ember span{background:linear-gradient(135deg,#3b2435,#633e46,#42324e,#66513f)}
+.daily-settings{margin:20px 0;padding:17px;border:1px solid #ede8f4;border-radius:16px;background:#f9f7fc}.daily-form{display:flex;gap:8px;align-items:center;margin-top:12px}.daily-form input{flex:1;min-width:0}.daily-form .primary{white-space:nowrap}.daily-list{margin-top:10px}.daily-item{display:flex;align-items:center;gap:6px;border-bottom:1px solid #eae5f0;padding:7px 2px;font-size:12px}.daily-item>span{flex:1;overflow-wrap:anywhere}.daily-empty{font-size:11px;color:#8b839a;line-height:1.9}.history-modal{min-height:220px}.history-day{margin:12px 0;border:1px solid #ebe6f2;border-radius:12px;padding:12px}.history-day summary{cursor:pointer;font-size:12px;color:#716286;line-height:1.8}.history-item{display:flex;gap:10px;align-items:start;padding:8px 2px;font-size:12px;overflow-wrap:anywhere}.history-check{color:#aaa;min-width:18px}.history-check.done{color:#6ea88b;font-weight:bold}
+body[data-palette="night"]{--tone-1:#201a3c;--tone-2:#493566;--tone-3:#242d50;--tone-4:#664653}
+body[data-palette="midnight"]{--tone-1:#10253b;--tone-2:#284462;--tone-3:#293555;--tone-4:#345b65}
+body[data-palette="forest"]{--tone-1:#142e2a;--tone-2:#284a39;--tone-3:#243b49;--tone-4:#525038}
+body[data-palette="ember"]{--tone-1:#3b2435;--tone-2:#633e46;--tone-3:#42324e;--tone-4:#66513f}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]){color:#f2edf8;color-scheme:dark}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .glass{background:#1d2032e8;border-color:#ffffff24;box-shadow:0 18px 50px #0005}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.brand,.welcome h1,.intro h1,.panel-header h2,.modal h2,.modal h3,.task-title,.aside-heading h3){color:#f0eaf8}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.intro>p,.welcome p,.panel-header p,.progress-copy,.modal-copy,.auth-card>div>p,.preference-heading p,.preference-note,.settings-info,.aside-foot,.site-footer,.empty p){color:#c3bbd0}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.modal,dialog){background:#202234;color:#f1eaf7}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(input,textarea,select,.add-form,.github-link,.private-note,.date-pill,.icon-button,.progress-ring>div,.auth-tabs button[aria-pressed="true"],.palette[aria-pressed="true"]){background:#303247;color:#f1eaf7;border-color:#ffffff2a}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.preferences,.daily-settings,.auth-tabs,.search-wrap){background:#292a3d;border-color:#ffffff20}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.quote-card,.panel-icon,.empty-icon){background:#413957;color:#e1d2ef;border-color:#ffffff20}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(label,.preference-heading h3,.sound-setting b,.stat-row b,.history-day summary,.empty b,.panel-footer,.task-meta,.tiny,.section-overline,.eyebrow,.intro-line b,.history-item,.palette,.palette-heading,.daily-empty){color:#d3c9df}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.toolbar,.task,.stat-row,.daily-item,.history-day,.palette-heading,.sound-setting,.settings-info,.topbar,.site-footer){border-color:#ffffff20}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .task:hover{background:#ffffff0d}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .progress-ring{background:conic-gradient(#b7a4e9 var(--progress),#444256 0)}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .progress-ring strong{color:#e5d5ff}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.filter.active,.sound-toggle,.password-toggle){background:#4c4261;color:#f3e8ff}
+@media(max-width:520px){.top-actions{gap:6px}.top-actions .text-button{font-size:11px}.daily-form .primary{padding:12px}}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.filter,.stat-row,.panel-footer,.intro-line small,.quote-card span,.sound-setting small,.password-toggle,.task-action,.link-button,.text-button){color:#d0c4e0}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(input,textarea)::placeholder{color:#aba1b8}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .notice{background:#583f4a;color:#ffe7e5}
