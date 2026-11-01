@@ -1,7 +1,7 @@
 name: Publish Pages
 on:
   push:
-    branches: ['**']
+    branches: ['main']
     paths-ignore: ['data/**']
   workflow_dispatch:
 permissions:
@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   deploy:
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -20,13 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v5
-      - name: Prepare static site and record the deployed branch
-        env:
-          DEPLOY_BRANCH: ${{ github.ref_name }}
+      - name: Prepare static site
         run: |
           mkdir -p _site
           cp index.html app.js core.js styles.css _site/
-          python3 -c 'import json, os; open("_site/runtime-config.js", "w").write("window.ROOZANEH_BRANCH = " + json.dumps(os.environ["DEPLOY_BRANCH"], ensure_ascii=True) + ";\n")'
+          cp -r assets _site/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: _site

@@ -1,8 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {setBranch,encryptToken,decryptToken,validateTasks,readFile,writeFile,validateToken,GithubError} from '../core.js';
-const BRANCH='feature/example';
-setBranch(BRANCH);
+import {BRANCH,encryptToken,decryptToken,validateTasks,readFile,writeFile,validateToken,GithubError} from '../core.js';
 const token='github_pat_example';
 const password='long unique password';
 test('vault roundtrip, incorrect password, tamper and fresh random values',async()=>{
@@ -33,22 +31,16 @@ test('validates owner and write access, rejects classic tokens',async()=>{
  const old=globalThis.fetch;let calls=0;try{globalThis.fetch=async()=>Response.json(++calls===1?{login:'pouriasafari117'}:{permissions:{push:true}});await validateToken(token);await assert.rejects(validateToken('ghp_example'));}finally{globalThis.fetch=old}
 });
 
-test('branch can change without retaining the previous branch',async()=>{
- const old=globalThis.fetch; try { setBranch('main'); globalThis.fetch=async(url,options)=>{assert.equal(JSON.parse(options.body).branch,'main');return Response.json({content:{sha:'ok'}})}; await writeFile('data/tasks.json',{},null,token,'save'); assert.throws(()=>setBranch('bad branch')); } finally {setBranch(BRANCH);globalThis.fetch=old}
-});
-
 test('repository validation uses GitHub repository endpoint without trailing slash',async()=>{
  const old=globalThis.fetch; const seen=[];
  try {globalThis.fetch=async(url)=>{seen.push(url);return Response.json(seen.length===1?{login:'pouriasafari117'}:{permissions:{push:true}})};
  await validateToken(token);assert.equal(seen[1],'https://api.github.com/repos/pouriasafari117/online_todolist');
  } finally {globalThis.fetch=old}
 });
-test('loads all branch pages from GitHub',async()=>{
- const old=globalThis.fetch;let calls=0;
- try {globalThis.fetch=async(url)=>{calls++;assert.match(url,/branches\?per_page=100&page=/);return Response.json(calls===1?Array.from({length:100},(_,i)=>({name:`branch-${i}`})):[{name:'main'}])};
- const {listBranches}=await import('../core.js');const branches=await listBranches();assert.equal(branches.length,101);assert.equal(branches.at(-1),'main');assert.equal(calls,2);
- } finally {globalThis.fetch=old}
-});
 test('network errors do not reveal request credentials',async()=>{
  const old=globalThis.fetch;try{globalThis.fetch=async()=>{throw new Error(`failed ${token}`)};await assert.rejects(validateToken(token),error=>error instanceof GithubError && error.status===0 && !error.message.includes(token));}finally{globalThis.fetch=old}
+});
+
+test('reads and writes target main regardless of deployment branch',async()=>{
+ const old=globalThis.fetch;try {assert.equal(BRANCH,'main');globalThis.fetch=async(url,options)=>{if(options.method==='PUT'){assert.equal(JSON.parse(options.body).branch,'main');return Response.json({content:{sha:'ok'}})}assert.match(url,/ref=main/);return Response.json({type:'file',encoding:'base64',sha:'v',content:btoa('{"schemaVersion":1,"tasks":[]}')})};await readFile('data/tasks.json');await writeFile('data/tasks.json',{},null,token,'save');}finally{globalThis.fetch=old}
 });
