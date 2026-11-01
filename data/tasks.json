@@ -1,6 +1,17 @@
 {
   "schemaVersion": 2,
-  "tasks": [],
+  "tasks": [
+    {
+      "id": "8362e1e6-5bc2-4b7a-be8f-80ecca122c17",
+      "title": "درس فردا 1",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-01T13:38:11.982Z",
+      "updatedAt": "2026-11-01T13:38:11.982Z"
+    }
+  ],
   "currentDay": "2026-11-01",
   "dailyTemplates": [
     {
