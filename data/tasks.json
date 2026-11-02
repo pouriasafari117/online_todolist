@@ -39,10 +39,10 @@
       "title": "درس فردا 4",
       "description": "",
       "completed": false,
-      "priority": "high",
+      "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-02T00:00:00.000Z",
-      "updatedAt": "2026-11-02T19:24:10.673Z",
+      "updatedAt": "2026-11-02T19:24:21.817Z",
       "dailyTemplateId": "957c681b-70f8-4291-9f38-b9df7123f341"
     },
     {
