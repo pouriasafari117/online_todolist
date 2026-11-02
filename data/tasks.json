@@ -5,11 +5,11 @@
       "id": "daily-1f20043a-2217-47d9-8d14-ea2a073e5f70-2026-11-02",
       "title": "درس فردا 1",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-02T00:00:00.000Z",
-      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T19:22:19.670Z",
       "dailyTemplateId": "1f20043a-2217-47d9-8d14-ea2a073e5f70"
     },
     {
