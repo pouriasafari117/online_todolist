@@ -60,9 +60,86 @@
       "dueDate": null,
       "createdAt": "2026-11-01T13:38:11.982Z",
       "updatedAt": "2026-11-01T13:38:11.982Z"
+    },
+    {
+      "id": "daily-1f20043a-2217-47d9-8d14-ea2a073e5f70-2026-11-02",
+      "title": "درس فردا 1",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "dailyTemplateId": "1f20043a-2217-47d9-8d14-ea2a073e5f70"
+    },
+    {
+      "id": "daily-b839e055-91e2-43cd-b3ca-edbe43d11ceb-2026-11-02",
+      "title": "درس فردا 2",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "dailyTemplateId": "b839e055-91e2-43cd-b3ca-edbe43d11ceb"
+    },
+    {
+      "id": "daily-a62560f0-0a69-4de1-8736-5b2e2657c424-2026-11-02",
+      "title": "درس فردا 3",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "dailyTemplateId": "a62560f0-0a69-4de1-8736-5b2e2657c424"
+    },
+    {
+      "id": "daily-957c681b-70f8-4291-9f38-b9df7123f341-2026-11-02",
+      "title": "درس فردا 4",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "dailyTemplateId": "957c681b-70f8-4291-9f38-b9df7123f341"
+    },
+    {
+      "id": "daily-ca6bd727-c831-4d16-88ec-e8425bb1104e-2026-11-02",
+      "title": "قران",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "dailyTemplateId": "ca6bd727-c831-4d16-88ec-e8425bb1104e"
+    },
+    {
+      "id": "daily-16a52c9b-6738-40bc-9b40-ad93a7400127-2026-11-02",
+      "title": "قران",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "dailyTemplateId": "16a52c9b-6738-40bc-9b40-ad93a7400127"
+    },
+    {
+      "id": "daily-b4c7e062-fb2b-4b9b-9d3a-397af57237c8-2026-11-02",
+      "title": "کد روزانه",
+      "description": "",
+      "completed": false,
+      "priority": "normal",
+      "dueDate": null,
+      "createdAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "dailyTemplateId": "b4c7e062-fb2b-4b9b-9d3a-397af57237c8"
     }
   ],
-  "currentDay": "2026-11-01",
+  "currentDay": "2026-11-02",
   "dailyTemplates": [
     {
       "id": "1f20043a-2217-47d9-8d14-ea2a073e5f70",
@@ -100,5 +177,71 @@
       "startDate": "2026-11-02"
     }
   ],
-  "history": []
+  "history": [
+    {
+      "date": "2026-11-01",
+      "tasks": [
+        {
+          "id": "2baced4c-68ad-43de-a3f0-366685103275",
+          "title": "کد روزانه",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-01T13:38:34.397Z",
+          "updatedAt": "2026-11-01T13:38:34.397Z"
+        },
+        {
+          "id": "4d4f4f8a-771d-4928-a108-53a736588a1d",
+          "title": "قران",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-01T13:38:25.492Z",
+          "updatedAt": "2026-11-01T13:38:25.492Z"
+        },
+        {
+          "id": "6852e266-b144-41a6-be75-06625271bf9f",
+          "title": "درس فردا 4",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-01T13:38:20.378Z",
+          "updatedAt": "2026-11-01T13:38:20.378Z"
+        },
+        {
+          "id": "2bd742ef-1176-421c-9324-996aca39e6a2",
+          "title": "درس فردا 3",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-01T13:38:17.664Z",
+          "updatedAt": "2026-11-01T13:38:17.664Z"
+        },
+        {
+          "id": "e3f37a2f-4de8-4625-b184-8ac5094a49bf",
+          "title": "درس فردا 2",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-01T13:38:14.615Z",
+          "updatedAt": "2026-11-01T13:38:14.615Z"
+        },
+        {
+          "id": "8362e1e6-5bc2-4b7a-be8f-80ecca122c17",
+          "title": "درس فردا 1",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-01T13:38:11.982Z",
+          "updatedAt": "2026-11-01T13:38:11.982Z"
+        }
+      ]
+    }
+  ]
 }
