@@ -71,11 +71,11 @@
       "id": "daily-b4c7e062-fb2b-4b9b-9d3a-397af57237c8-2026-11-02",
       "title": "کد روزانه",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-02T00:00:00.000Z",
-      "updatedAt": "2026-11-02T00:00:00.000Z",
+      "updatedAt": "2026-11-02T19:55:16.577Z",
       "dailyTemplateId": "b4c7e062-fb2b-4b9b-9d3a-397af57237c8"
     }
   ],
