@@ -65,3 +65,18 @@ test('removed templates do not erase today or history, and clock rollback never 
 test('Tehran calendar defines rollover independently of the device timezone',async()=>{
  const {todayInTehran,nextDay}=await import('../core.js');assert.equal(todayInTehran(new Date('2026-01-01T20:29:59Z')),'2026-01-01');assert.equal(todayInTehran(new Date('2026-01-01T20:30:00Z')),'2026-01-02');assert.equal(nextDay('2024-02-28'),'2024-02-29');assert.throws(()=>nextDay('2026-02-30'));
 });
+
+test('Persian month navigation follows Nowruz and leap-year Esfand',async()=>{
+ const {persianMonth}=await import('../core.js');
+ const farvardin=persianMonth('2024-03-20');assert.deepEqual([farvardin.year,farvardin.month,farvardin.first],[1403,1,'2024-03-20']);assert.equal(farvardin.dates.length,31);
+ const esfand=persianMonth(farvardin.previous);assert.equal(esfand.month,12);assert.equal(esfand.next,farvardin.first);assert.equal(esfand.dates.length,29);
+ const leap=persianMonth('2025-03-20');assert.equal(leap.month,12);assert.equal(leap.dates.length,30);assert.equal(persianMonth(leap.next).month,1);
+});
+test('monthly performance distinguishes no data, no tasks, zero and live today',async()=>{
+ const {monthlyHistory}=await import('../core.js');const task=(id,completed)=>({id,completed});
+ const book={currentDay:'2024-03-23',history:[{date:'2024-03-20',tasks:[task('a',true),task('b',false)]},{date:'2024-03-21',tasks:[]},{date:'2024-03-22',tasks:[task('c',false)]}]};
+ const report=monthlyHistory(book,[task('d',true)],book.currentDay);const days=report.days;
+ assert.equal(days[0].percentage,50);assert.equal(days[1].percentage,null);assert.deepEqual(days[1].tasks,[]);assert.equal(days[2].percentage,0);assert.equal(days[3].percentage,100);assert.equal(days[4].tasks,null);
+ assert.equal(report.recordedDays,4);assert.equal(report.done,2);assert.equal(report.total,4);assert.equal(report.percentage,50);
+ const previous=monthlyHistory(book,[],report.previous);assert.equal(previous.recordedDays,0);assert.equal(previous.percentage,null);
+});

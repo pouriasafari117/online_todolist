@@ -149,3 +149,43 @@ export function prepareBook(input, day = todayInTehran()) {
   if(new TextEncoder().encode(JSON.stringify(book,null,2)+'\n').length>750000) throw new Error('حجم دفتر بیش از حد مجاز است؛ تاریخچه حذف یا بازنویسی نشد.');
   return {book,changed:true};
 }
+
+// Calendar navigation uses Jalali months; storage remains Gregorian ISO days in Tehran.
+const persianParts = new Intl.DateTimeFormat('en-US-u-ca-persian-nu-latn', {
+  timeZone:'UTC', year:'numeric', month:'numeric', day:'numeric'
+});
+function persianDateParts(day) {
+  checkDay(day);
+  const parts=persianParts.formatToParts(new Date(`${day}T12:00:00Z`));
+  const get=key=>Number(parts.find(part=>part.type===key).value);
+  return {year:get('year'),month:get('month'),day:get('day')};
+}
+function previousDay(day) {
+  checkDay(day);
+  const date=new Date(`${day}T00:00:00Z`);date.setUTCDate(date.getUTCDate()-1);
+  return date.toISOString().slice(0,10);
+}
+export function persianMonth(day) {
+  const current=persianDateParts(day);
+  let first=day;
+  for(let i=1;i<current.day;i++) first=previousDay(first);
+  const dates=[];let cursor=first;
+  while(dates.length<32){
+    const parts=persianDateParts(cursor);
+    if(parts.year!==current.year || parts.month!==current.month) break;
+    dates.push(cursor);cursor=nextDay(cursor);
+  }
+  return {year:current.year,month:current.month,first,dates,next:cursor,previous:previousDay(first)};
+}
+export function monthlyHistory(book,tasks,anchor) {
+  const month=persianMonth(anchor);
+  const records=new Map(book.history.map(entry=>[entry.date,entry.tasks]));
+  records.set(book.currentDay,tasks);
+  const days=month.dates.map(date=>{
+    if(!records.has(date))return {date,tasks:null,done:0,total:0,percentage:null};
+    const dayTasks=records.get(date),total=dayTasks.length,done=dayTasks.filter(task=>task.completed).length;
+    return {date,tasks:dayTasks,done,total,percentage:total?Math.round(done*100/total):null};
+  });
+  const total=days.reduce((sum,day)=>sum+day.total,0),done=days.reduce((sum,day)=>sum+day.done,0);
+  return {...month,days,total,done,percentage:total?Math.round(done*100/total):null,recordedDays:days.filter(day=>day.tasks!==null).length};
+}
