@@ -66,3 +66,34 @@ body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"]
 body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.filter,.stat-row,.panel-footer,.intro-line small,.quote-card span,.sound-setting small,.password-toggle,.task-action,.link-button,.text-button){color:#d0c4e0}
 body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(input,textarea)::placeholder{color:#aba1b8}
 body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .notice{background:#583f4a;color:#ffe7e5}
+/* Straight, aligned dashboard and a readable monthly history surface. */
+.dashboard-grid{align-items:start;grid-template-columns:minmax(0,1fr) minmax(260px,300px)}
+.task-panel,.progress-card,.quote-card{border-radius:20px}
+.panel-header,.aside-heading{align-items:center}.task-panel{min-width:0}
+@keyframes gentle-float{from{transform:translateY(-3px)}to{transform:translateY(4px)}}
+.history-dialog{width:min(900px,calc(100% - 32px));max-width:900px}
+.history-modal{padding:30px;max-height:88vh;overflow-y:auto}
+.history-modal .modal-copy{margin:8px 0 20px}
+.month-navigation{display:grid;grid-template-columns:42px 1fr 42px;align-items:center;gap:12px;text-align:center;padding:14px;border:1px solid #ece8f2;border-radius:16px;background:#f8f6fb}
+.month-navigation small{display:block;color:#a49ab8;font-size:10px}.month-navigation h3{color:#514967;font-size:16px;margin:5px 0 0}
+.month-arrow{width:42px;height:42px;border:1px solid #e8e3f0;background:#fff;border-radius:12px;color:#806fb0;font-size:19px}
+.month-arrow:disabled{opacity:.35;cursor:default}
+.month-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.month-summary>div{padding:16px;border:1px solid #eeeaf3;border-radius:15px;background:#faf9fc}
+.month-summary small,.month-summary strong{display:block}.month-summary small{font-size:11px;color:#9690a4}.month-summary strong{font-size:20px;color:#6f5d9e;margin-top:8px;direction:rtl}
+.chart-card{border:1px solid #eeeaf3;border-radius:16px;padding:20px;background:#fff}
+.history-section-head{display:flex;justify-content:space-between;align-items:start;gap:10px}.history-section-head h3{font-size:13px;margin:0;color:#5f5770}.history-section-head p{font-size:11px;color:#9991a6;margin:7px 0;line-height:1.8}.history-section-head>span{color:#a997ce;font-size:18px}
+.chart-scroll{overflow-x:auto;overscroll-behavior-x:contain;padding:7px 0 3px}.history-chart{display:flex;align-items:stretch;gap:3px;min-width:620px;height:160px;border-bottom:1px solid #ece8f2}
+.chart-day{display:flex;flex:1;flex-direction:column;align-items:center;gap:8px;border:0;background:transparent;color:#898199;padding:0 2px 3px;min-width:17px;cursor:pointer}.chart-day:disabled{opacity:1;cursor:default}
+.chart-track{height:130px;width:100%;position:relative;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(to top,#f2eff6 1px,transparent 1px);background-size:100% 25%}
+.chart-bar{display:block;width:100%;max-width:14px;min-height:3px;border-radius:5px 5px 2px 2px;background:linear-gradient(0deg,#8b78c2,#c3b2e8);transition:filter .2s ease}
+.chart-day:not(:disabled):hover .chart-bar{filter:brightness(.85)}.chart-no-data{width:4px;height:4px;border-radius:50%;background:#d9d3e2;margin-bottom:1px}.chart-day-label{font-size:10px;line-height:1}
+.chart-note,.history-footnote{font-size:11px;color:#9b94a7;line-height:1.9;margin:12px 0 0}.history-list-head{margin:24px 0 12px}.history-day summary{display:flex;justify-content:space-between;gap:12px;list-style:none;align-items:center}.history-day summary::-webkit-details-marker{display:none}.history-day summary:after{content:'+';color:#a99bc6;font-size:17px}.history-day[open] summary:after{content:'−'}.history-day summary>span:first-child{flex:1}.history-count{color:#9b90ac;font-size:11px;white-space:nowrap}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.month-navigation,.month-summary>div,.chart-card){background:#292a3d;border-color:#ffffff20}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.month-navigation h3,.history-section-head h3,.month-summary strong){color:#eadcfb}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) :is(.history-section-head p,.chart-note,.history-footnote,.month-summary small,.month-navigation small,.chart-day,.history-count){color:#c1b5d0}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .month-arrow{background:#303247;border-color:#ffffff2a;color:#eadcfb}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .chart-track{background:linear-gradient(to top,#ffffff20 1px,transparent 1px);background-size:100% 25%}
+body:is([data-palette="night"],[data-palette="midnight"],[data-palette="forest"],[data-palette="ember"]) .history-chart{border-color:#ffffff20}
+@media(max-width:850px){.dashboard-grid{grid-template-columns:1fr}}
+@media(max-width:520px){.history-modal{padding:20px 16px}.month-summary{gap:6px}.month-summary>div{padding:12px 8px}.month-summary strong{font-size:16px}.month-summary small{font-size:10px}.chart-card{padding:15px}.history-day summary{flex-wrap:wrap}.history-count{font-size:10px}.history-day summary>span:first-child{flex:1 1 70%}}

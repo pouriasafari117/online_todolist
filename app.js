@@ -1,4 +1,4 @@
-import {VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks,prepareBook,todayInTehran,nextDay} from './core.js';
+import {VAULT_PATH,TASK_PATH,GithubError,encryptToken,decryptToken,validateToken,readFile,writeFile,validateTasks,prepareBook,todayInTehran,nextDay,persianMonth,monthlyHistory} from './core.js';
 const $=id=>document.getElementById(id);
 // Keep visibility controls outside form submission and reset them whenever a form is cleared.
 document.querySelectorAll('input[data-password-field], #token').forEach(input=>{
@@ -117,7 +117,7 @@ function render(){
   show('empty',visible.length===0);const done=tasks.filter(t=>t.completed).length, total=tasks.length, percentage=total?Math.round(done/total*100):0;
   $('total').textContent=fa(total);$('done').textContent=fa(done);$('remaining').textContent=fa(total-done);$('percent').textContent=fa(percentage)+'٪';$('progress-ring').style.setProperty('--progress',percentage+'%');$('count-label').textContent=fa(total-done)+' کار باقی‌مانده';
 }
-function changed(){revision++;render();if(conflict){sync('error','تعارض همگام‌سازی؛ نسخهٔ محلی را دریافت کن یا نسخهٔ GitHub را بارگذاری کن.');return}sync('pending','تغییرات در انتظار همگام‌سازی...');clearTimeout(timer);timer=setTimeout(save,800)}
+function changed(){revision++;render();if($('history-dialog').open)renderHistory();if(conflict){sync('error','تعارض همگام‌سازی؛ نسخهٔ محلی را دریافت کن یا نسخهٔ GitHub را بارگذاری کن.');return}sync('pending','تغییرات در انتظار همگام‌سازی...');clearTimeout(timer);timer=setTimeout(save,800)}
 async function save(){
   clearTimeout(timer);if(saving||!token||conflict||revision===savedRevision)return;
   saving=true;const currentRevision=revision;const snapshot=structuredClone({...book,tasks});const baseSha=taskSha;
@@ -150,18 +150,47 @@ function renderDaily(){
   }
 }
 $('daily-form').onsubmit=e=>{e.preventDefault();if(!refreshDay())return;const title=$('daily-title').value.trim();if(!title)return;if(book.dailyTemplates.length>=100){alert('حداکثر ۱۰۰ کار روزانه قابل ثبت است.');return}book.dailyTemplates.push({id:crypto.randomUUID(),title,startDate:nextDay(book.currentDay)});e.currentTarget.reset();renderDaily();changed()};
+let historyAnchor=null;
+function historyDate(day){return new Intl.DateTimeFormat('fa-IR',{timeZone:'UTC',weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(new Date(day+'T12:00:00Z'))}
 function renderHistory(){
-  const list=$('history-list');list.replaceChildren();
-  if(!book.history.length){const p=document.createElement('p');p.className='daily-empty';p.textContent='هنوز روزی در تاریخچه ثبت نشده است.';list.append(p);return}
-  for(const entry of [...book.history].reverse()){
+  if(!book)return;
+  const report=monthlyHistory(book,tasks,historyAnchor||book.currentDay);
+  const label=new Intl.DateTimeFormat('fa-IR',{timeZone:'UTC',year:'numeric',month:'long'}).format(new Date(report.first+'T12:00:00Z'));
+  $('history-month').textContent=label;
+  $('month-rate').textContent=report.percentage===null?'—':fa(report.percentage)+'٪';
+  $('month-done').textContent=fa(report.done)+' / '+fa(report.total);
+  $('month-days').textContent=fa(report.recordedDays);
+  const earliest=book.history.length?book.history[0].date:book.currentDay;
+  $('history-prev').disabled=report.first<=persianMonth(earliest).first;
+  $('history-next').disabled=report.first>=persianMonth(book.currentDay).first;
+  const chart=$('history-chart'),list=$('history-list');chart.replaceChildren();list.replaceChildren();
+  const groups=new Map();
+  const recorded=report.days.filter(day=>day.tasks!==null);
+  if(!recorded.length){const empty=document.createElement('p');empty.className='daily-empty';empty.textContent='برای این ماه هنوز تاریخچه‌ای ثبت نشده است.';list.append(empty)}
+  for(const day of [...recorded].reverse()){
     const group=document.createElement('details');group.className='history-day';
-    const summary=document.createElement('summary');const date=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',weekday:'long',year:'numeric',month:'long',day:'numeric'}).format(new Date(entry.date+'T12:00:00Z'));
-    const done=entry.tasks.filter(t=>t.completed).length;summary.textContent=`${date}  ·  ${fa(done)} از ${fa(entry.tasks.length)} انجام شده`;group.append(summary);
-    if(!entry.tasks.length){const p=document.createElement('p');p.className='daily-empty';p.textContent='کاری ثبت نشده بود.';group.append(p)}
-    for(const task of entry.tasks){const row=document.createElement('div');row.className='history-item';const mark=document.createElement('span');mark.className=task.completed?'history-check done':'history-check';mark.textContent=task.completed?'✓':'○';const name=document.createElement('span');name.textContent=task.title+(task.dailyTemplateId?'  ↻':'');row.append(mark,name);group.append(row)}list.append(group);
+    const summary=document.createElement('summary');
+    const date=document.createElement('span');date.textContent=historyDate(day.date)+(day.date===book.currentDay?' · امروز':'');
+    const count=document.createElement('span');count.className='history-count';count.textContent=fa(day.done)+' از '+fa(day.total)+' انجام شده';summary.append(date,count);group.append(summary);
+    if(!day.tasks.length){const p=document.createElement('p');p.className='daily-empty';p.textContent='کاری ثبت نشده بود.';group.append(p)}
+    for(const task of day.tasks){const row=document.createElement('div');row.className='history-item';const mark=document.createElement('span');mark.className=task.completed?'history-check done':'history-check';mark.textContent=task.completed?'✓':'○';const name=document.createElement('span');name.textContent=task.title+(task.dailyTemplateId?'  ↻':'');row.append(mark,name);group.append(row)}
+    list.append(group);groups.set(day.date,group);
   }
+  report.days.forEach((day,index)=>{
+    const button=document.createElement('button');button.type='button';button.className='chart-day';
+    const desc=day.tasks===null?'بدون داده':day.total===0?'بدون کار':`${fa(day.done)} از ${fa(day.total)} کار، ${fa(day.percentage)} درصد`;
+    button.setAttribute('aria-label',`${historyDate(day.date)}، ${desc}`);button.title=desc;button.disabled=day.tasks===null;
+    const track=document.createElement('span');track.className='chart-track';
+    if(day.percentage===null){const dot=document.createElement('span');dot.className='chart-no-data';track.append(dot)}
+    else {const bar=document.createElement('span');bar.className='chart-bar';bar.style.height=Math.max(2,day.percentage)+'%';track.append(bar)}
+    const number=document.createElement('span');number.className='chart-day-label';number.textContent=fa(index+1);button.append(track,number);
+    if(day.tasks!==null)button.onclick=()=>{const group=groups.get(day.date);group.open=true;group.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'nearest'})};
+    chart.append(button);
+  });
 }
-$('history-open').onclick=()=>{if(!refreshDay())return;renderHistory();$('history-dialog').showModal()};
+$('history-prev').onclick=()=>{historyAnchor=persianMonth(historyAnchor||book.currentDay).previous;renderHistory()};
+$('history-next').onclick=()=>{historyAnchor=persianMonth(historyAnchor||book.currentDay).next;renderHistory()};
+$('history-open').onclick=()=>{if(!refreshDay())return;historyAnchor=book.currentDay;renderHistory();$('history-dialog').showModal()};
 function refreshDay(){
   if(!token||!book)return true;
   try{const prepared=prepareBook({...book,tasks});if(prepared.changed){book=prepared.book;tasks=book.tasks;$('today').textContent=new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',weekday:'long',day:'numeric',month:'long'}).format(new Date());renderDaily();if($('history-dialog').open)renderHistory();changed()}return true}
