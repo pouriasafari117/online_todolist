@@ -2,16 +2,6 @@
   "schemaVersion": 2,
   "tasks": [
     {
-      "id": "8362e1e6-5bc2-4b7a-be8f-80ecca122c17",
-      "title": "درس فردا 1",
-      "description": "",
-      "completed": false,
-      "priority": "normal",
-      "dueDate": null,
-      "createdAt": "2026-11-01T13:38:11.982Z",
-      "updatedAt": "2026-11-01T13:38:11.982Z"
-    },
-    {
       "id": "daily-1f20043a-2217-47d9-8d14-ea2a073e5f70-2026-11-02",
       "title": "درس فردا 1",
       "description": "",
