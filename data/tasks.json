@@ -38,11 +38,11 @@
       "id": "daily-957c681b-70f8-4291-9f38-b9df7123f341-2026-11-04",
       "title": "درس فردا 4",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-04T00:00:00.000Z",
-      "updatedAt": "2026-11-04T00:00:00.000Z",
+      "updatedAt": "2026-11-04T20:05:47.802Z",
       "dailyTemplateId": "957c681b-70f8-4291-9f38-b9df7123f341"
     },
     {
@@ -71,11 +71,11 @@
       "id": "daily-b4c7e062-fb2b-4b9b-9d3a-397af57237c8-2026-11-04",
       "title": "کد روزانه",
       "description": "",
-      "completed": true,
+      "completed": false,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-04T00:00:00.000Z",
-      "updatedAt": "2026-11-04T17:34:21.371Z",
+      "updatedAt": "2026-11-04T20:05:48.533Z",
       "dailyTemplateId": "b4c7e062-fb2b-4b9b-9d3a-397af57237c8"
     }
   ],
