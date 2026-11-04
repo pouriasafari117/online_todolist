@@ -2,84 +2,84 @@
   "schemaVersion": 2,
   "tasks": [
     {
-      "id": "daily-1f20043a-2217-47d9-8d14-ea2a073e5f70-2026-11-03",
+      "id": "daily-1f20043a-2217-47d9-8d14-ea2a073e5f70-2026-11-04",
       "title": "درس فردا 1",
       "description": "",
       "completed": false,
       "priority": "normal",
       "dueDate": null,
-      "createdAt": "2026-11-03T00:00:00.000Z",
-      "updatedAt": "2026-11-03T00:00:00.000Z",
+      "createdAt": "2026-11-04T00:00:00.000Z",
+      "updatedAt": "2026-11-04T00:00:00.000Z",
       "dailyTemplateId": "1f20043a-2217-47d9-8d14-ea2a073e5f70"
     },
     {
-      "id": "daily-b839e055-91e2-43cd-b3ca-edbe43d11ceb-2026-11-03",
+      "id": "daily-b839e055-91e2-43cd-b3ca-edbe43d11ceb-2026-11-04",
       "title": "درس فردا 2",
       "description": "",
       "completed": false,
       "priority": "normal",
       "dueDate": null,
-      "createdAt": "2026-11-03T00:00:00.000Z",
-      "updatedAt": "2026-11-03T00:00:00.000Z",
+      "createdAt": "2026-11-04T00:00:00.000Z",
+      "updatedAt": "2026-11-04T00:00:00.000Z",
       "dailyTemplateId": "b839e055-91e2-43cd-b3ca-edbe43d11ceb"
     },
     {
-      "id": "daily-a62560f0-0a69-4de1-8736-5b2e2657c424-2026-11-03",
+      "id": "daily-a62560f0-0a69-4de1-8736-5b2e2657c424-2026-11-04",
       "title": "درس فردا 3",
       "description": "",
       "completed": false,
       "priority": "normal",
       "dueDate": null,
-      "createdAt": "2026-11-03T00:00:00.000Z",
-      "updatedAt": "2026-11-03T00:00:00.000Z",
+      "createdAt": "2026-11-04T00:00:00.000Z",
+      "updatedAt": "2026-11-04T00:00:00.000Z",
       "dailyTemplateId": "a62560f0-0a69-4de1-8736-5b2e2657c424"
     },
     {
-      "id": "daily-957c681b-70f8-4291-9f38-b9df7123f341-2026-11-03",
+      "id": "daily-957c681b-70f8-4291-9f38-b9df7123f341-2026-11-04",
       "title": "درس فردا 4",
       "description": "",
       "completed": false,
       "priority": "normal",
       "dueDate": null,
-      "createdAt": "2026-11-03T00:00:00.000Z",
-      "updatedAt": "2026-11-03T00:00:00.000Z",
+      "createdAt": "2026-11-04T00:00:00.000Z",
+      "updatedAt": "2026-11-04T00:00:00.000Z",
       "dailyTemplateId": "957c681b-70f8-4291-9f38-b9df7123f341"
     },
     {
-      "id": "daily-ca6bd727-c831-4d16-88ec-e8425bb1104e-2026-11-03",
+      "id": "daily-ca6bd727-c831-4d16-88ec-e8425bb1104e-2026-11-04",
       "title": "قران",
       "description": "",
       "completed": false,
       "priority": "normal",
       "dueDate": null,
-      "createdAt": "2026-11-03T00:00:00.000Z",
-      "updatedAt": "2026-11-03T00:00:00.000Z",
+      "createdAt": "2026-11-04T00:00:00.000Z",
+      "updatedAt": "2026-11-04T00:00:00.000Z",
       "dailyTemplateId": "ca6bd727-c831-4d16-88ec-e8425bb1104e"
     },
     {
-      "id": "daily-16a52c9b-6738-40bc-9b40-ad93a7400127-2026-11-03",
+      "id": "daily-16a52c9b-6738-40bc-9b40-ad93a7400127-2026-11-04",
       "title": "قران",
       "description": "",
       "completed": false,
       "priority": "normal",
       "dueDate": null,
-      "createdAt": "2026-11-03T00:00:00.000Z",
-      "updatedAt": "2026-11-03T00:00:00.000Z",
+      "createdAt": "2026-11-04T00:00:00.000Z",
+      "updatedAt": "2026-11-04T00:00:00.000Z",
       "dailyTemplateId": "16a52c9b-6738-40bc-9b40-ad93a7400127"
     },
     {
-      "id": "daily-b4c7e062-fb2b-4b9b-9d3a-397af57237c8-2026-11-03",
+      "id": "daily-b4c7e062-fb2b-4b9b-9d3a-397af57237c8-2026-11-04",
       "title": "کد روزانه",
       "description": "",
       "completed": false,
       "priority": "normal",
       "dueDate": null,
-      "createdAt": "2026-11-03T00:00:00.000Z",
-      "updatedAt": "2026-11-03T00:00:00.000Z",
+      "createdAt": "2026-11-04T00:00:00.000Z",
+      "updatedAt": "2026-11-04T00:00:00.000Z",
       "dailyTemplateId": "b4c7e062-fb2b-4b9b-9d3a-397af57237c8"
     }
   ],
-  "currentDay": "2026-11-03",
+  "currentDay": "2026-11-04",
   "dailyTemplates": [
     {
       "id": "1f20043a-2217-47d9-8d14-ea2a073e5f70",
@@ -261,6 +261,88 @@
           "dueDate": null,
           "createdAt": "2026-11-02T00:00:00.000Z",
           "updatedAt": "2026-11-02T19:55:16.577Z",
+          "dailyTemplateId": "b4c7e062-fb2b-4b9b-9d3a-397af57237c8"
+        }
+      ]
+    },
+    {
+      "date": "2026-11-03",
+      "tasks": [
+        {
+          "id": "daily-1f20043a-2217-47d9-8d14-ea2a073e5f70-2026-11-03",
+          "title": "درس فردا 1",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-03T00:00:00.000Z",
+          "updatedAt": "2026-11-03T00:00:00.000Z",
+          "dailyTemplateId": "1f20043a-2217-47d9-8d14-ea2a073e5f70"
+        },
+        {
+          "id": "daily-b839e055-91e2-43cd-b3ca-edbe43d11ceb-2026-11-03",
+          "title": "درس فردا 2",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-03T00:00:00.000Z",
+          "updatedAt": "2026-11-03T00:00:00.000Z",
+          "dailyTemplateId": "b839e055-91e2-43cd-b3ca-edbe43d11ceb"
+        },
+        {
+          "id": "daily-a62560f0-0a69-4de1-8736-5b2e2657c424-2026-11-03",
+          "title": "درس فردا 3",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-03T00:00:00.000Z",
+          "updatedAt": "2026-11-03T00:00:00.000Z",
+          "dailyTemplateId": "a62560f0-0a69-4de1-8736-5b2e2657c424"
+        },
+        {
+          "id": "daily-957c681b-70f8-4291-9f38-b9df7123f341-2026-11-03",
+          "title": "درس فردا 4",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-03T00:00:00.000Z",
+          "updatedAt": "2026-11-03T00:00:00.000Z",
+          "dailyTemplateId": "957c681b-70f8-4291-9f38-b9df7123f341"
+        },
+        {
+          "id": "daily-ca6bd727-c831-4d16-88ec-e8425bb1104e-2026-11-03",
+          "title": "قران",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-03T00:00:00.000Z",
+          "updatedAt": "2026-11-03T00:00:00.000Z",
+          "dailyTemplateId": "ca6bd727-c831-4d16-88ec-e8425bb1104e"
+        },
+        {
+          "id": "daily-16a52c9b-6738-40bc-9b40-ad93a7400127-2026-11-03",
+          "title": "قران",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-03T00:00:00.000Z",
+          "updatedAt": "2026-11-03T00:00:00.000Z",
+          "dailyTemplateId": "16a52c9b-6738-40bc-9b40-ad93a7400127"
+        },
+        {
+          "id": "daily-b4c7e062-fb2b-4b9b-9d3a-397af57237c8-2026-11-03",
+          "title": "کد روزانه",
+          "description": "",
+          "completed": false,
+          "priority": "normal",
+          "dueDate": null,
+          "createdAt": "2026-11-03T00:00:00.000Z",
+          "updatedAt": "2026-11-03T00:00:00.000Z",
           "dailyTemplateId": "b4c7e062-fb2b-4b9b-9d3a-397af57237c8"
         }
       ]
