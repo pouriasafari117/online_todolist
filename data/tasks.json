@@ -38,11 +38,11 @@
       "id": "daily-957c681b-70f8-4291-9f38-b9df7123f341-2026-11-05",
       "title": "درس فردا 4",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-05T00:00:00.000Z",
-      "updatedAt": "2026-11-05T00:00:00.000Z",
+      "updatedAt": "2026-11-05T20:23:25.511Z",
       "dailyTemplateId": "957c681b-70f8-4291-9f38-b9df7123f341"
     },
     {
@@ -60,11 +60,11 @@
       "id": "daily-16a52c9b-6738-40bc-9b40-ad93a7400127-2026-11-05",
       "title": "قران",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-05T00:00:00.000Z",
-      "updatedAt": "2026-11-05T00:00:00.000Z",
+      "updatedAt": "2026-11-05T19:38:26.090Z",
       "dailyTemplateId": "16a52c9b-6738-40bc-9b40-ad93a7400127"
     },
     {
