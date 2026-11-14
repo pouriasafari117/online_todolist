@@ -49,11 +49,11 @@
       "id": "daily-ca6bd727-c831-4d16-88ec-e8425bb1104e-2026-11-14",
       "title": "قران",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-14T00:00:00.000Z",
-      "updatedAt": "2026-11-14T00:00:00.000Z",
+      "updatedAt": "2026-11-14T14:43:23.158Z",
       "dailyTemplateId": "ca6bd727-c831-4d16-88ec-e8425bb1104e"
     },
     {
