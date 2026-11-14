@@ -13,11 +13,12 @@ document.querySelectorAll('input[data-password-field], #token').forEach(input=>{
 });
 // Appearance and sound preferences are local to this browser; no secrets are stored.
 const paletteNames=['lavender','ocean','sunset','garden','night','midnight','forest','ember'];
+const paletteLabels={lavender:'آرامش',ocean:'اقیانوس',sunset:'غروب',garden:'باغ',night:'شب بنفش',midnight:'نیمه‌شب',forest:'جنگل شب',ember:'غروب شب'};
 function readPreference(key){try{return localStorage.getItem(key)}catch{return null}}
 function writePreference(key,value){try{localStorage.setItem(key,value)}catch{/* storage is optional */}}
 function applyPalette(name){
   if(!paletteNames.includes(name)) name='lavender';
-  document.body.dataset.palette=name;writePreference('roozaneh-palette',name);
+  document.body.dataset.palette=name;writePreference('roozaneh-palette',name);$('theme-name').textContent=paletteLabels[name];
   document.querySelectorAll('[data-palette]').forEach(button=>{if(button.matches('button'))button.setAttribute('aria-pressed',String(button.dataset.palette===name))});
 }
 let soundEnabled=readPreference('roozaneh-sound')!=='off', audioContext;
