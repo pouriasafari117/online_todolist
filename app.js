@@ -12,8 +12,8 @@ document.querySelectorAll('input[data-password-field], #token').forEach(input=>{
   setVisible(!isToken);wrapper.append(button);
 });
 // Appearance and sound preferences are local to this browser; no secrets are stored.
-const paletteNames=['lavender','ocean','sunset','garden','night','midnight','forest','ember'];
-const paletteLabels={lavender:'آرامش',ocean:'اقیانوس',sunset:'غروب',garden:'باغ',night:'شب بنفش',midnight:'نیمه‌شب',forest:'جنگل شب',ember:'غروب شب'};
+const paletteNames=['lavender','ocean','sunset','garden','peach','sky','night','midnight','forest','ember','aurora','plum'];
+const paletteLabels={lavender:'آرامش',ocean:'اقیانوس',sunset:'غروب',garden:'باغ',peach:'شکوفه',sky:'آسمان',night:'شب بنفش',midnight:'نیمه‌شب',forest:'جنگل شب',ember:'غروب شب',aurora:'شفق',plum:'آلو' };
 function readPreference(key){try{return localStorage.getItem(key)}catch{return null}}
 function writePreference(key,value){try{localStorage.setItem(key,value)}catch{/* storage is optional */}}
 function applyPalette(name){
