@@ -82,11 +82,11 @@
       "id": "daily-061f4894-b1e5-48ab-8a31-904e6fd5d4f3-2026-11-20",
       "title": "کار",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-20T00:00:00.000Z",
-      "updatedAt": "2026-11-20T00:00:00.000Z",
+      "updatedAt": "2026-11-20T14:28:16.293Z",
       "dailyTemplateId": "061f4894-b1e5-48ab-8a31-904e6fd5d4f3"
     },
     {
