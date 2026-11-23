@@ -60,22 +60,22 @@
       "id": "daily-16a52c9b-6738-40bc-9b40-ad93a7400127-2026-11-23",
       "title": "قران",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-23T00:00:00.000Z",
-      "updatedAt": "2026-11-23T00:00:00.000Z",
+      "updatedAt": "2026-11-23T19:44:44.300Z",
       "dailyTemplateId": "16a52c9b-6738-40bc-9b40-ad93a7400127"
     },
     {
       "id": "daily-b4c7e062-fb2b-4b9b-9d3a-397af57237c8-2026-11-23",
       "title": "کد روزانه",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-23T00:00:00.000Z",
-      "updatedAt": "2026-11-23T00:00:00.000Z",
+      "updatedAt": "2026-11-23T19:44:42.390Z",
       "dailyTemplateId": "b4c7e062-fb2b-4b9b-9d3a-397af57237c8"
     },
     {
