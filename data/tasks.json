@@ -104,11 +104,11 @@
       "id": "daily-21530c14-93f7-443e-b795-c50d03fc9ba5-2026-11-23",
       "title": "درس فردا 5",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-23T00:00:00.000Z",
-      "updatedAt": "2026-11-23T00:00:00.000Z",
+      "updatedAt": "2026-11-23T20:25:27.505Z",
       "dailyTemplateId": "21530c14-93f7-443e-b795-c50d03fc9ba5"
     }
   ],
