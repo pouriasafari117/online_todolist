@@ -16,11 +16,11 @@
       "id": "daily-b839e055-91e2-43cd-b3ca-edbe43d11ceb-2026-11-28",
       "title": "درس فردا 2",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-28T00:00:00.000Z",
-      "updatedAt": "2026-11-28T00:00:00.000Z",
+      "updatedAt": "2026-11-28T17:11:54.829Z",
       "dailyTemplateId": "b839e055-91e2-43cd-b3ca-edbe43d11ceb"
     },
     {
@@ -93,11 +93,11 @@
       "id": "daily-c0cc7e6c-8895-4613-b66f-0322c83fbdf2-2026-11-28",
       "title": "کار",
       "description": "",
-      "completed": false,
+      "completed": true,
       "priority": "normal",
       "dueDate": null,
       "createdAt": "2026-11-28T00:00:00.000Z",
-      "updatedAt": "2026-11-28T00:00:00.000Z",
+      "updatedAt": "2026-11-28T17:11:58.474Z",
       "dailyTemplateId": "c0cc7e6c-8895-4613-b66f-0322c83fbdf2"
     },
     {
